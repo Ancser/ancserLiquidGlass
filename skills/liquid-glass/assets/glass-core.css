@@ -1,0 +1,126 @@
+/* ============================================================
+   liquid-glass core — structural CSS
+
+   This is scaffold, not styling. The SVG filter renders into this
+   structure, and it depends on the exact box model here: the layer is
+   inset:0 inside the surface's own border, and the world is the
+   coordinate system the sampled clone is translated within.
+
+   Restyle .optical-surface (radius, border colour, shadow) freely.
+   Do not change position/inset/overflow on .optical-layer,
+   .optical-world or .optical-stage-copy — the geometry maths in
+   glass-core.js measures against them.
+   ============================================================ */
+
+.filter-root {
+    position: fixed;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.optical-surface {
+    position: absolute;
+    z-index: 5;
+    overflow: hidden;
+    border: 1px solid var(--glass-rim);
+    border-radius: 999px;
+    background: var(--glass-tint);
+    box-shadow:
+        var(--glass-relief);
+    contain: paint;
+    clip-path: inset(0 round 999px);
+    -webkit-clip-path: inset(0 round 999px);
+    transform-origin: center;
+    will-change: transform;
+}
+
+.optical-layer {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    display: block;
+    overflow: visible;
+    border-radius: inherit;
+    pointer-events: none;
+    will-change: filter;
+}
+
+.optical-world {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.optical-stage-copy {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+}
+
+.optical-stage-copy [data-optical] {
+    visibility: hidden !important;
+}
+
+/* UI-007: optical output never samples itself. A Tier-2 lens inside a
+   sample would be the compositor painting its own previous frame --
+   a feedback path, not a reflection. Tier-1 stays visible-as-material
+   (the rule above hides its live layer, so the copy can only ever
+   carry static material, never a lens). */
+.optical-stage-copy [data-glass-tier="2"] {
+    display: none !important;
+}
+
+.optical-background-copy .control-source-content {
+    visibility: hidden !important;
+}
+
+.optical-content-copy * {
+    visibility: hidden !important;
+}
+
+.optical-content-copy {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+.optical-content-copy::before,
+.optical-content-copy::after {
+    content: none !important;
+    display: none !important;
+}
+
+.optical-content-copy .control-source-content,
+.optical-content-copy .control-source-content * {
+    visibility: visible !important;
+}
+
+.optical-content-layer {
+    z-index: 1;
+}
+
+.optical-world .optical-layer {
+    display: none !important;
+}
+
+.surface-content {
+    position: relative;
+    z-index: 2;
+}
+
+.control-source-content {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    will-change: clip-path;
+}

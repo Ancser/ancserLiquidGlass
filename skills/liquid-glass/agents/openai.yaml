@@ -1,0 +1,7 @@
+interface:
+  display_name: "Liquid Glass"
+  short_description: "Build performant refractive glass UI"
+  default_prompt: "Use $liquid-glass to build or debug a performant refractive glass component with the bundled SVG engine."
+
+policy:
+  allow_implicit_invocation: true

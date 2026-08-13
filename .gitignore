@@ -1,0 +1,10 @@
+# Python test/runtime output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+tests/
+
+# Local editor and environment files
+.venv/
+.env
+.vscode/

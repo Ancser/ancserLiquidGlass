@@ -1,0 +1,2471 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Liquid Optics Component Lab</title>
+    <link rel="stylesheet" href="skills/liquid-glass/assets/glass-core.css">
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #090a0f;
+            --panel: #121319;
+            --panel-2: #0f1016;
+            --line: rgb(255 255 255 / 0.10);
+            --text: #f8f8fb;
+            --muted: #9697a3;
+            --green: #30d158;
+            --blue: #5ac8fa;
+            --pink: #ff375f;
+            --spring: cubic-bezier(.2, .82, .22, 1.08);
+
+            /* Surface treatment for every lens. Hoisted into tokens so the
+               dock, FAB, slider thumb and switch thumb cannot drift apart. */
+            --glass-rim: rgb(235 242 255 / 0.42);
+            --glass-tint: rgb(255 255 255 / 0.008);
+            --glass-relief:
+                inset 0 1px 1px rgb(255 255 255 / 0.18),
+                inset 0 -1px 1px rgb(0 0 0 / 0.34),
+                0 10px 26px rgb(0 0 0 / 0.22);
+            --stage-scrim: linear-gradient(135deg, rgb(7 8 14 / 0.18), rgb(7 8 14 / 0.48));
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+            margin: 0;
+            background: var(--bg);
+        }
+
+        body {
+            color: var(--text);
+            font-family:
+                ui-rounded, "SF Pro Rounded", "SF Pro Display",
+                Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            color: inherit;
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 330px minmax(0, 1fr);
+            min-height: 100vh;
+        }
+
+        .tuner {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: auto;
+            padding: 22px 18px;
+            border-right: 1px solid var(--line);
+            background: #08090d;
+        }
+
+        .tuner h1 {
+            margin: 0 0 6px;
+            font-size: 24px;
+            letter-spacing: -0.045em;
+        }
+
+        .tuner-copy {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .target-picker {
+            display: grid;
+            gap: 7px;
+            margin-bottom: 12px;
+        }
+
+        .target-picker label,
+        .group-title {
+            color: #a9aab3;
+            font-size: 10px;
+            font-weight: 850;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .target-picker select {
+            width: 100%;
+            border: 1px solid rgb(255 255 255 / 0.13);
+            border-radius: 14px;
+            padding: 10px 12px;
+            color: #fff;
+            background: #111218;
+            outline: none;
+        }
+
+        .control-groups {
+            display: grid;
+            gap: 12px;
+        }
+
+        .control-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .group-title {
+            grid-column: 1 / -1;
+            margin: 4px 2px -1px;
+        }
+
+        .control {
+            min-width: 0;
+            padding: 10px;
+            border: 1px solid rgb(255 255 255 / 0.08);
+            border-radius: 16px;
+            background: #111218;
+        }
+
+        .control.wide {
+            grid-column: 1 / -1;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            margin-bottom: 7px;
+            color: #aaaab4;
+            font-size: 9px;
+            font-weight: 850;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+
+        .control output {
+            color: #fff;
+            font-size: 10px;
+            letter-spacing: 0;
+            text-transform: none;
+            white-space: nowrap;
+        }
+
+        .control input[type="range"] {
+            width: 100%;
+            margin: 0;
+            accent-color: var(--green);
+        }
+
+        .control select {
+            width: 100%;
+            border: 0;
+            border-radius: 10px;
+            padding: 7px 8px;
+            color: #fff;
+            background: #090a0f;
+            outline: none;
+            font-size: 11px;
+        }
+
+        .kernel {
+            margin-top: 12px;
+            padding: 12px;
+            border: 1px solid rgb(255 255 255 / 0.08);
+            border-radius: 18px;
+            background: #0f1016;
+        }
+
+        .kernel-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: #aaaab4;
+            font-size: 10px;
+            font-weight: 850;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .kernel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .kernel img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 1.25;
+            border: 1px solid rgb(255 255 255 / 0.08);
+            border-radius: 11px;
+            background: #050608;
+            object-fit: fill;
+        }
+
+        .reset {
+            width: 100%;
+            margin-top: 10px;
+            border: 1px solid rgb(255 255 255 / 0.12);
+            border-radius: 14px;
+            padding: 10px;
+            color: #fff;
+            background: #14151b;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        .gallery {
+            min-width: 0;
+            width: 100%;
+            max-width: 1540px;
+            margin: 0 auto;
+            padding: 24px 28px 64px;
+        }
+
+        .gallery-footer {
+            grid-column: 1 / -1;
+            max-width: 720px;
+            margin: 56px auto 8px;
+            padding: 26px 28px 30px;
+            border-top: 1px solid var(--line);
+            text-align: center;
+        }
+
+        .footer-line {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .footer-note {
+            margin-top: 10px;
+            font-size: 12.5px;
+            line-height: 1.8;
+            opacity: 0.82;
+        }
+
+        .gallery-footer a {
+            color: var(--text);
+            text-decoration-color: var(--line);
+            text-underline-offset: 3px;
+        }
+
+        .gallery-footer a:hover {
+            text-decoration-color: currentColor;
+        }
+
+        .gallery-footer code {
+            padding: 1px 5px;
+            border-radius: 5px;
+            background: rgb(255 255 255 / 0.06);
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 0.92em;
+        }
+
+        .exhibit-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+            margin-top: 22px;
+        }
+
+        .exhibit {
+            min-width: 0;
+            overflow: hidden;
+            border: 1px solid rgb(255 255 255 / 0.085);
+            border-radius: 34px;
+            padding: 0 28px 28px;
+            background: var(--panel);
+        }
+
+        .exhibit.hero {
+            grid-column: 1 / -1;
+            padding-inline: 34px;
+        }
+
+        .exhibit-heading {
+            display: grid;
+            justify-items: center;
+            gap: 10px;
+            min-height: 176px;
+            padding: 0 18px 26px;
+            text-align: center;
+        }
+
+        .exhibit:not(.hero) .exhibit-heading {
+            min-height: 190px;
+        }
+
+        .number {
+            min-width: 62px;
+            padding: 10px 16px;
+            border-radius: 0 0 999px 999px;
+            color: #9899a4;
+            background: #202127;
+            font-size: 14px;
+            font-weight: 850;
+            letter-spacing: 0.08em;
+        }
+
+        .exhibit h2 {
+            margin: 4px 0 0;
+            /* Sized so the longest EN + zh pair still shares one line;
+               the two names are parallel, not a title and a subtitle. */
+            font-size: clamp(22px, 2.15vw, 31px);
+            line-height: 1;
+            letter-spacing: -0.055em;
+        }
+
+        /* Both names are the component's name, so neither is a subtitle:
+           same size, same weight, same colour, on one line. The divider is
+           a pseudo-element so it disappears when the pair wraps. */
+        .exhibit h2 {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: center;
+            gap: 0.12em 0.62em;
+        }
+
+        .name-zh {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 0 0.42em;
+            /* zh-Hant glyphs read large at a shared size; -0.04em keeps the
+               optical weight of the two scripts matched. */
+            font-size: 0.96em;
+            letter-spacing: -0.01em;
+        }
+
+        /* Separation is a gap, not a rule. A divider glyph belongs to the zh
+           span, so when the pair wraps in a narrow column it lands at the
+           start of the second line looking like a stray mark. */
+
+        .exhibit-heading p {
+            max-width: 560px;
+            margin: 0;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.45;
+        }
+
+        .tuner-io {
+            margin-top: 14px;
+        }
+
+        .tuner-io-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .tuner-io-btn {
+            padding: 9px 4px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            color: var(--text);
+            background: var(--panel);
+            font: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .tuner-io-btn:hover {
+            border-color: rgb(255 255 255 / 0.24);
+        }
+
+        .tuner-io-status {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .tuner-io-status.is-dirty {
+            color: var(--green);
+        }
+
+        .settings-preview {
+            margin-top: 10px;
+            border: 1px solid rgb(255 255 255 / 0.08);
+            border-radius: 12px;
+            background: #0f1016;
+        }
+
+        .settings-preview summary {
+            padding: 8px 10px;
+            color: #aaaab4;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 850;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .settings-preview pre {
+            max-height: 220px;
+            margin: 0;
+            overflow: auto;
+            padding: 0 10px 10px;
+            color: #d7d8df;
+            font: 10px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+            white-space: pre-wrap;
+        }
+
+        .stage {
+            --stage-fill: #08090e;
+            position: relative;
+            min-height: 420px;
+            overflow: hidden;
+            border-radius: 28px;
+            background: #08090e;
+            isolation: isolate;
+            touch-action: none;
+        }
+
+        .hero .stage {
+            min-height: 520px;
+        }
+
+        .stage::before,
+        .stage::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(55px);
+            opacity: 0.52;
+            pointer-events: none;
+        }
+
+        .stage::before {
+            width: 260px;
+            height: 260px;
+            left: 8%;
+            top: 18%;
+            background: var(--stage-a, #143c78);
+        }
+
+        .stage::after {
+            width: 280px;
+            height: 280px;
+            right: 4%;
+            bottom: 2%;
+            background: var(--stage-b, #27123f);
+        }
+
+        .precision-stage {
+            --stage-a: #151729;
+            --stage-b: #090a0f;
+        }
+
+        .precision-world {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            grid-template-columns: minmax(280px, 0.9fr) minmax(420px, 1.15fr);
+            align-items: center;
+            gap: clamp(24px, 5vw, 82px);
+            padding: 34px;
+        }
+
+        .precision-copy {
+            position: relative;
+            z-index: 2;
+        }
+
+        .kicker {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaaab4;
+            font-size: 11px;
+            font-weight: 850;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .precision-copy h3 {
+            margin: 0;
+            font-size: clamp(60px, 7vw, 104px);
+            line-height: 0.84;
+            letter-spacing: -0.075em;
+        }
+
+        .precision-copy p {
+            margin: 22px 0 0;
+            color: #aaaab4;
+            font-size: 18px;
+        }
+
+        .precision-image {
+            position: relative;
+            z-index: 2;
+            /* Square so the full record sleeve reads, never cropped. */
+            aspect-ratio: 1 / 1;
+            width: min(420px, 100%);
+            justify-self: center;
+            overflow: hidden;
+            border-radius: 28px;
+        }
+
+        .precision-image img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        
+
+        .fab-button .surface-content {
+            display: block;
+            transition: transform 80ms linear;
+        }
+
+        .precision-lens {
+            width: 200px;
+            height: 140px;
+            left: 7%;
+            top: 54%;
+            cursor: grab;
+        }
+
+        .precision-lens.dragging {
+            cursor: grabbing;
+        }
+
+        .experiment-stage {
+            display: grid;
+            place-items: center;
+            padding: 28px;
+        }
+
+        .experiment-stage {
+            /* Square so each sleeve shows whole, never cropped by the stage box. */
+            aspect-ratio: 1 / 1;
+            min-height: 0;
+            /* One reference sleeve on every stage.
+
+               Nine different covers meant comparing optics and artwork at the
+               same time -- a dark cockpit and a white piano sleeve refract
+               nothing alike, so a difference between two panels told you
+               nothing about the surfaces. Tropic of Capricorn is the
+               reference because it carries the widest range in one frame:
+               near-black cockpit, blown-out sky, saturated orange gauges and
+               fine instrument detail, so shrink, refraction and chromatic
+               spread are all legible against it.
+
+               Override --stage-art on a single stage to compare one panel
+               against different art without disturbing the rest. */
+            --stage-art: url("assets/vinyl-tropic-of-capricorn.jpg");
+        }
+
+            .experiment-stage::before {
+            z-index: 0;
+            inset: 0;
+            width: auto;
+            height: auto;
+            border-radius: inherit;
+            background: var(--stage-art) center / cover no-repeat;
+            filter: none;
+            opacity: 0.82;
+        }
+
+        .experiment-stage::after {
+            z-index: 0;
+            inset: 0;
+            width: auto;
+            height: auto;
+            border-radius: inherit;
+            background: var(--stage-scrim);
+            filter: none;
+            opacity: 1;
+        }
+
+        .fluid-slider {
+            position: relative;
+            z-index: 2;
+            width: min(88%, 410px);
+            height: 86px;
+            cursor: ew-resize;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .slider-track {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 16px;
+            border-radius: 999px;
+            background: rgb(0 0 0 / 0.40);
+            box-shadow: inset 0 1px 4px rgb(0 0 0 / 0.42);
+            transform: translateY(-50%);
+        }
+
+        .slider-fill {
+            width: 42%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #32d474, #5ac8fa);
+            will-change: width;
+        }
+
+        .fluid-slider.endpoint-transition .slider-fill {
+            transition: width 130ms cubic-bezier(.2, .82, .22, 1);
+        }
+
+        .slider-thumb {
+            left: 0;
+            top: 13px;
+            width: 112px;
+            height: 60px;
+            border-color: transparent;
+            background: rgb(255 255 255);
+            box-shadow: none;
+        }
+
+        .slider-thumb .optical-layer {
+            opacity: var(--slider-glass, 0);
+        }
+
+        .fluid-slider.interacting .slider-thumb {
+            border-color: var(--glass-rim);
+            background: var(--glass-tint);
+            box-shadow:
+                var(--glass-relief);
+        }
+
+        .switch-track {
+            --switch-progress: 1;
+            --switch-track-color: rgb(48 209 88);
+            --switch-thumb-color: rgb(255 255 255);
+            position: relative;
+            z-index: 2;
+            width: 172px;
+            height: 72px;
+            border: 0;
+            border-radius: 999px;
+            padding: 0;
+            overflow: visible;
+            background: var(--switch-track-color);
+            box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+            cursor: pointer;
+            touch-action: none;
+        }
+
+        .switch-thumb {
+            left: 5px;
+            top: 5px;
+            width: 92px;
+            height: 62px;
+            border-color: transparent;
+            background: var(--switch-thumb-color);
+            box-shadow: none;
+            transition:
+                background 70ms linear,
+                border-color 70ms linear,
+                box-shadow 70ms linear;
+        }
+
+        .switch-thumb .optical-layer {
+            opacity: var(--switch-glass, 0);
+        }
+
+        /* The thumb keeps its white face at rest, but once the lens is up that
+           face becomes a backdrop, not a surface. shrink 0.40 compresses the
+           sampled track hard toward the centre, and whatever it vacates falls
+           through to whatever the thumb is painted with. Any fill placed
+           INSIDE the lens is no help -- it is filter input, so it shrinks
+           along with everything else. The vacated ring can only be coloured
+           from underneath, which is what this does.
+
+           UI-017: it lives on ::before and is driven by --switch-glass, NOT by
+           the .interacting class, because the two run on different clocks.
+           apply() drops `interacting` the frame the thumb stops moving, while
+           --switch-glass keeps easing out on the spring for ~70ms more. With
+           the backdrop on a class-triggered `background` transition the thumb
+           was repainted solid while the lens had already faded -- a blink on
+           every release. Same variable as the lens = same clock = no blink. */
+        .switch-thumb::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            border-radius: inherit;
+            background: var(--stage-fill, var(--bg));
+            opacity: var(--switch-glass, 0);
+            pointer-events: none;
+        }
+
+        .switch-track.interacting .switch-thumb {
+            border-color: var(--glass-rim);
+            box-shadow:
+                var(--glass-relief);
+        }
+
+        .switch-track.interacting .switch-thumb .optical-layer {
+            opacity: 1;
+        }
+
+        .dock-track,
+        .segment-track {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            align-items: center;
+            width: min(92%, 430px);
+            height: 82px;
+            border: 1px solid rgb(255 255 255 / 0.10);
+            border-radius: 999px;
+            background: rgb(0 0 0 / 0.30);
+            touch-action: none;
+        }
+
+        .dock-track {
+            grid-template-columns: repeat(5, 1fr);
+            padding: 7px;
+        }
+
+        .segment-track {
+            grid-template-columns: repeat(3, 1fr);
+            height: 66px;
+            padding: 4px;
+        }
+
+        .dock-track button,
+        .segment-track button {
+            position: relative;
+            z-index: 6;
+            height: 100%;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        .control-source-content {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            display: grid;
+            place-items: center;
+            pointer-events: none;
+            will-change: clip-path;
+        }
+
+        .dock-track .control-source-content {
+            display: grid;
+            place-items: center;
+            place-content: center;
+            gap: 2px;
+            color: #fff;
+            font-size: 27.3px;
+            line-height: 0.9;
+        }
+
+        .dock-track small {
+            color: #fff;
+            font-size: 11.7px;
+        }
+
+        .dock-bubble {
+            left: 7px;
+            top: 7px;
+            width: calc((100% - 14px) / 5);
+            height: 66px;
+        }
+
+        .segment-indicator {
+            left: 4px;
+            top: 4px;
+            width: calc((100% - 8px) / 3);
+            height: 58px;
+        }
+
+        .dock-bubble,
+        .segment-indicator {
+            pointer-events: none;
+            border-color: transparent;
+            background: rgb(255 255 255 / 0.075);
+            box-shadow: none;
+            backdrop-filter: blur(11px) saturate(1.12);
+            -webkit-backdrop-filter: blur(11px) saturate(1.12);
+            transition:
+                background 90ms linear,
+                border-color 90ms linear,
+                box-shadow 90ms linear;
+        }
+
+        .control-container-glass {
+            z-index: 0;
+            inset: 0;
+            width: auto;
+            height: auto;
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        .container-shell-copy .dock-track,
+        .container-shell-copy .segment-track {
+            border-color: transparent !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        .container-shell-copy .control-source-content {
+            visibility: hidden !important;
+        }
+
+        .dock-bubble > .optical-layer,
+        .segment-indicator > .optical-layer {
+            opacity: var(--control-glass, 0);
+        }
+
+        /* The glyph pass is not the backdrop pass. It is the only copy of the
+           label while the original is clipped out beneath the pill, so it
+           follows the mask rather than the backdrop's fade. Same specificity
+           as the rule above, so order decides -- this must stay second. */
+        .dock-bubble > .optical-content-layer,
+        .segment-indicator > .optical-content-layer {
+            opacity: var(--control-content, 0);
+        }
+
+        /* Backing for pixels the lens sampled past the edge of its stage,
+           which come back transparent and would otherwise cut a hole in the
+           pill. Like the switch backdrop above it fades with the LENS, not
+           with .interacting: keyed to the class it stayed fully opaque while
+           --control-glass faded out, leaving a window with the lens gone and
+           the backing bare before the idle frost returned.
+
+           ::before rather than a background on the pill so it can carry its
+           own opacity; it paints ahead of .optical-layer at the same z-index,
+           so it sits under the lens and over the idle frost. */
+        .dock-bubble::before,
+        .segment-indicator::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            border-radius: inherit;
+            background: var(--stage-fill, var(--bg));
+            opacity: var(--control-glass, 0);
+            pointer-events: none;
+        }
+
+        .dock-track.interacting .dock-bubble,
+        .segment-track.interacting .segment-indicator {
+            border-color: var(--glass-rim);
+            box-shadow:
+                var(--glass-relief);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        .fluid-input-shell {
+            position: relative;
+            z-index: 2;
+            width: min(86%, 390px);
+            height: 68px;
+        }
+
+        .fluid-input-shell input {
+            position: relative;
+            z-index: 3;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            outline: 0;
+            padding: 0 28px;
+            color: #fff;
+            background: transparent;
+            font-size: 18px;
+            font-weight: 750;
+        }
+
+        .fluid-input-shell input::placeholder {
+            color: rgb(255 255 255 / 0.44);
+        }
+
+        .volume-zone {
+            position: relative;
+            z-index: 2;
+            width: 150px;
+            height: 360px;
+            border-radius: 999px;
+            outline: none;
+            touch-action: none;
+            cursor: ns-resize;
+        }
+
+        .volume-zone:focus-visible {
+            box-shadow: none;
+        }
+
+        .volume-zone:focus-visible .volume-glass {
+            outline: 1px solid rgb(255 229 138 / 0.52);
+            outline-offset: 2px;
+        }
+
+        .volume-reservoir {
+            position: absolute;
+            z-index: 3;
+            left: 30px;
+            top: 10px;
+            width: 90px;
+            height: 340px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgb(0 0 0 / 0.38);
+            box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+            pointer-events: none;
+            transform-origin: center;
+            will-change: transform;
+        }
+
+        .volume-fill {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 52%;
+            border-radius: 0;
+            background: linear-gradient(180deg, #ffd84d, #ffb800);
+            box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.48);
+            will-change: height;
+        }
+
+        .volume-glass {
+            left: 30px;
+            top: 10px;
+            width: 90px;
+            height: 340px;
+            pointer-events: none;
+        }
+
+        .volume-glass-fill {
+            position: absolute;
+            z-index: 2;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 52%;
+            border-radius: 0;
+            background: linear-gradient(180deg, #ffe46b, #ffb800);
+            box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.58);
+            opacity: 0.76;
+            mix-blend-mode: screen;
+            pointer-events: none;
+            will-change: height;
+        }
+
+        .fab-world {
+            position: relative;
+            z-index: 2;
+            width: min(90%, 430px);
+            height: 310px;
+        }
+
+        .fab-button,
+        .fab-action {
+            display: grid;
+            place-items: center;
+            width: 76px;
+            height: 76px;
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+            font-size: 28px;
+        }
+
+        .fab-button {
+            right: 14px;
+            bottom: 14px;
+        }
+
+        .fab-action {
+            right: 21px;
+            bottom: 14px;
+            width: 62px;
+            height: 62px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .fab-action.open {
+            pointer-events: auto;
+        }
+
+        .stepper {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: 64px 70px 64px;
+            align-items: center;
+            width: 198px;
+            height: 76px;
+        }
+
+        .stepper button {
+            position: relative;
+            z-index: 3;
+            height: 100%;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            font-size: 28px;
+        }
+
+        .stepper output {
+            position: relative;
+            z-index: 3;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 900;
+        }
+
+        @media (max-width: 1050px) {
+            .app {
+                grid-template-columns: 280px minmax(0, 1fr);
+            }
+
+            .exhibit-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .precision-world {
+                grid-template-columns: 1fr;
+                align-content: center;
+            }
+
+            .hero .stage {
+                min-height: 680px;
+            }
+
+            .precision-image {
+                width: min(320px, 100%);
+            }
+        }
+
+        @media (max-width: 760px) {
+            .app {
+                grid-template-columns: 1fr;
+            }
+
+            .tuner {
+                position: relative;
+                height: auto;
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .gallery {
+                padding: 16px;
+            }
+
+            .exhibit {
+                padding: 0 14px 14px;
+                border-radius: 26px;
+            }
+
+            .stage {
+                min-height: 390px;
+            }
+
+            .precision-world {
+                padding: 22px;
+            }
+
+            .precision-copy h3 {
+                font-size: 58px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <svg class="filter-root" data-glass-defs aria-hidden="true">
+        <defs id="filterDefs"></defs>
+    </svg>
+
+    <div class="app">
+        <aside class="tuner">
+            <h1>Liquid Optics Core</h1>
+            <p class="tuner-copy">Each component keeps an independent optical kernel and motion preset.</p>
+
+            <div class="target-picker">
+                <label for="targetSelect">Target component</label>
+                <select id="targetSelect"></select>
+            </div>
+
+            <div class="control-groups" id="controls"></div>
+
+            <div class="kernel">
+                <div class="kernel-head">
+                    <span>Selected kernel</span>
+                    <span id="kernelSize">—</span>
+                </div>
+                <div class="kernel-grid">
+                    <img id="displacementPreview" alt="RG displacement map">
+                    <img id="specularPreview" alt="Specular map">
+                </div>
+            </div>
+
+            <button class="reset" id="resetButton" type="button">Reset selected component</button>
+
+            <div class="tuner-io">
+                <div class="tuner-io-row">
+                    <button class="tuner-io-btn" id="saveButton" type="button">Save</button>
+                    <button class="tuner-io-btn" id="copyButton" type="button">Copy</button>
+                    <button class="tuner-io-btn" id="loadButton" type="button">Load</button>
+                </div>
+                <p class="tuner-io-status" id="tunerStatus">matching shipped defaults</p>
+                <details class="settings-preview" open>
+                    <summary>Current settings</summary>
+                    <pre id="settingsPreview"></pre>
+                </details>
+                <input id="loadInput" type="file" accept="application/json,.json" hidden>
+            </div>
+        </aside>
+
+        <main class="gallery">
+            <section class="exhibit hero" data-component-card="precision">
+                <header class="exhibit-heading">
+                    <span class="number">01</span>
+                    <h2><span class="name-en">Precision Lens</span><span class="name-zh" lang="zh-Hant">精密放大鏡</span></h2>
+                    <p>Drag the capsule to bend the visual space. A physical magnifying glass.</p>
+                </header>
+                <div class="stage precision-stage" data-stage="precision">
+                    <div class="precision-world">
+                        <div class="precision-copy">
+                            <span class="kicker">Kikuchi Momoko</span>
+                            <h3>Tropic of<br>Capricorn</h3>
+                            <p>Drag the capsule across the sleeve.</p>
+                        </div>
+                        <div class="precision-image">
+                            <img src="assets/vinyl-tropic-of-capricorn.jpg" alt="Tropic of Capricorn — Kikuchi Momoko" draggable="false">
+                        </div>
+                    </div>
+                    <div class="optical-surface precision-lens" data-optical="precision" id="precisionLens"></div>
+                </div>
+            </section>
+
+            <div class="exhibit-grid">
+                <article class="exhibit" data-component-card="slider">
+                    <header class="exhibit-heading">
+                        <span class="number">02</span>
+                        <h2><span class="name-en">Fluid Slider</span><span class="name-zh" lang="zh-Hant">流體滑桿</span></h2>
+                        <p>Squishy pill reacting to drag velocity.</p>
+                    </header>
+                    <div class="stage experiment-stage slider-stage" data-stage="slider">
+                        <div class="fluid-slider" id="fluidSlider">
+                            <div class="slider-track"><div class="slider-fill" id="sliderFill"></div></div>
+                            <div class="optical-surface slider-thumb" data-optical="slider" id="sliderThumb"></div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="exhibit" data-component-card="switch">
+                    <header class="exhibit-heading">
+                        <span class="number">03</span>
+                        <h2><span class="name-en">Tactile Switch</span><span class="name-zh" lang="zh-Hant">觸感開關</span></h2>
+                        <p>Press compression and spring travel reveal the glass thumb.</p>
+                    </header>
+                    <div class="stage experiment-stage switch-stage" data-stage="switch">
+                        <button class="switch-track on" id="tactileSwitch" type="button" aria-pressed="true">
+                            <span class="optical-surface switch-thumb" data-optical="switch" id="switchThumb"></span>
+                        </button>
+                    </div>
+                </article>
+
+                <article class="exhibit" data-component-card="dock">
+                    <header class="exhibit-heading">
+                        <span class="number">04</span>
+                        <h2><span class="name-en">Drag Dock</span><span class="name-zh" lang="zh-Hant">拖移 Dock</span></h2>
+                        <p>Kinematic snapping pill highlighting icons.</p>
+                    </header>
+                    <div class="stage experiment-stage dock-stage" data-stage="dock">
+                        <nav class="dock-track" id="dragDock" aria-label="Drag dock">
+                            <span class="optical-surface control-container-glass" data-optical="dockContainer" data-container-glass aria-hidden="true"></span>
+                            <span class="optical-surface dock-bubble" data-optical="dock" id="dockBubble"></span>
+                            <button type="button" data-dock-index="0"><span class="control-source-content">⌁<small>Scan</small></span></button>
+                            <button type="button" data-dock-index="1"><span class="control-source-content">▦<small>Rank</small></span></button>
+                            <button type="button" data-dock-index="2"><span class="control-source-content">◉<small>Live</small></span></button>
+                            <button type="button" data-dock-index="3"><span class="control-source-content">⌘<small>Flow</small></span></button>
+                            <button type="button" data-dock-index="4"><span class="control-source-content">⚙<small>Setup</small></span></button>
+                        </nav>
+                    </div>
+                </article>
+
+                <article class="exhibit" data-component-card="segment">
+                    <header class="exhibit-heading">
+                        <span class="number">05</span>
+                        <h2><span class="name-en">Segment Control</span><span class="name-zh" lang="zh-Hant">分段控制項</span></h2>
+                        <p>Glass pill rapidly scales over items.</p>
+                    </header>
+                    <div class="stage experiment-stage segment-stage" data-stage="segment">
+                        <nav class="segment-track" id="segmentControl" aria-label="Segment control">
+                            <span class="optical-surface control-container-glass" data-optical="segmentContainer" data-container-glass aria-hidden="true"></span>
+                            <span class="optical-surface segment-indicator" data-optical="segment" id="segmentIndicator"></span>
+                            <button type="button" data-segment-index="0"><span class="control-source-content">Core</span></button>
+                            <button type="button" data-segment-index="1"><span class="control-source-content">System</span></button>
+                            <button type="button" data-segment-index="2"><span class="control-source-content">Logs</span></button>
+                        </nav>
+                    </div>
+                </article>
+
+                <article class="exhibit" data-component-card="input">
+                    <header class="exhibit-heading">
+                        <span class="number">06</span>
+                        <h2><span class="name-en">Fluid Input</span><span class="name-zh" lang="zh-Hant">流體文字欄位</span></h2>
+                        <p>Typing triggers micro-vibrations across the glass box.</p>
+                    </header>
+                    <div class="stage experiment-stage input-stage" data-stage="input">
+                        <label class="optical-surface fluid-input-shell" data-optical="input" data-container-glass id="fluidInputShell">
+                            <input class="surface-content" id="fluidInput" placeholder="Provide input..." autocomplete="off">
+                        </label>
+                    </div>
+                </article>
+
+                <article class="exhibit" data-component-card="volume">
+                    <header class="exhibit-heading">
+                        <span class="number">07</span>
+                        <h2><span class="name-en">Squish Volume</span><span class="name-zh" lang="zh-Hant">擠壓音量滑桿</span></h2>
+                        <p>Y-axis bounds scaling applied during over-drag.</p>
+                    </header>
+                    <div class="stage experiment-stage volume-stage" data-stage="volume">
+                        <div class="volume-zone" id="volumeZone" role="slider" tabindex="0" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="52">
+                            <div class="volume-reservoir"><div class="volume-fill" id="volumeFill"></div></div>
+                            <div class="optical-surface volume-glass" data-optical="volume" id="volumeGlass">
+                                <div class="volume-glass-fill" id="volumeGlassFill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="exhibit" data-component-card="fab">
+                    <header class="exhibit-heading">
+                        <span class="number">08</span>
+                        <h2><span class="name-en">Layered FAB</span><span class="name-zh" lang="zh-Hant">分層浮動按鈕</span></h2>
+                        <p>Elements push each other physically.</p>
+                    </header>
+                    <div class="stage experiment-stage fab-stage" data-stage="fab">
+                        <div class="fab-world">
+                            <button class="optical-surface fab-action" data-optical="fab" data-fab-action="0" type="button"><span class="surface-content">＋</span></button>
+                            <button class="optical-surface fab-action" data-optical="fab" data-fab-action="1" type="button"><span class="surface-content">◇</span></button>
+                            <button class="optical-surface fab-action" data-optical="fab" data-fab-action="2" type="button"><span class="surface-content">⌁</span></button>
+                            <button class="optical-surface fab-button" data-optical="fab" id="fabButton" type="button" aria-expanded="false"><span class="surface-content">≡</span></button>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="exhibit" data-component-card="stepper">
+                    <header class="exhibit-heading">
+                        <span class="number">09</span>
+                        <h2><span class="name-en">Magnetic Stepper</span><span class="name-zh" lang="zh-Hant">磁吸步進器</span></h2>
+                        <p>Kinematic mass shifts upon tap interaction.</p>
+                    </header>
+                    <div class="stage experiment-stage stepper-stage" data-stage="stepper">
+                        <div class="optical-surface stepper" data-optical="stepper" data-container-glass id="magneticStepper">
+                            <button class="surface-content" id="stepDown" type="button" aria-label="Decrease">−</button>
+                            <output class="surface-content" id="stepValue">2</output>
+                            <button class="surface-content" id="stepUp" type="button" aria-label="Increase">＋</button>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <footer class="gallery-footer">
+                <p class="footer-line">
+                    Optical core after
+                    <a href="https://kube.io/blog/liquid-glass-css-svg/"
+                       target="_blank" rel="noreferrer noopener">Liquid Glass in the
+                        Browser: Refraction with CSS and SVG</a>
+                    — kube.io, 4 September 2025.
+                </p>
+                <p class="footer-line footer-note">
+                    That article works out the refraction field and encodes it as an
+                    image, red channel for X and green for Y, so
+                    <code>feDisplacementMap</code> can bend the backdrop. This page
+                    bakes the same maps and reads them back with
+                    <code>xChannelSelector="R"</code> and
+                    <code>yChannelSelector="G"</code>.
+                </p>
+                <p class="footer-line footer-note" lang="zh-Hant">
+                    折射核心參考 kube.io 的〈Liquid Glass in the Browser〉一文:
+                    將折射位移場烘焙成貼圖,紅色通道對應 X 軸、綠色通道對應 Y 軸,
+                    再交給 <code>feDisplacementMap</code> 彎折背景。
+                </p>
+            </footer>
+        </main>
+    </div>
+
+        <script src="skills/liquid-glass/assets/glass-core.js"></script>
+    <script>
+        (() => {
+            "use strict";
+            const defaults = {
+                /* Values below track ancserTPX 1.0.10p (tpx-glass.js:60-85).
+
+                   bezel and thickness are deliberately NOT taken from TPX.
+                   Its comment records why: "APX's 19px bezel belongs to a
+                   62px-high thumb. TPX's thumb is 22px high, so a
+                   proportional 7px bezel keeps a clear centre." This
+                   gallery's switch thumb measures 92x62 -- it is the 62px
+                   geometry, so these bezel/thickness values are the correct
+                   ones for it and TPX's are tuned for a different element.
+
+                   Pill and container shrink are separate surfaces with
+                   separate configs, so they are set independently. A container
+                   pinned at 0 stays full-size no matter how far the PILL's
+                   shrink is pushed, which is what made the selector read as a
+                   shrunk pill on an unshrunk shell. The selector is
+                   intentionally more shrunken than its shell (dock/segment
+                   0.20, container 0.00/0.02), so a thick edge does not turn
+                   into a block of sampled pixels. */
+                precision: { profile: "convex-squircle", bezel: 23, refraction: 1.11, thickness: 106, shrink: -0.20, filterScale: 1.50, specular: 0.60, blur: 0.00, saturation: 1.05, idleScale: 1.20, activeScale: 2.00, stiffness: 120, damping: 10, stretch: 0.00 },
+                slider: { profile: "convex-squircle", bezel: 16, refraction: 0.85, thickness: 80, shrink: 0.00, specular: 0.60, blur: 0.10, saturation: 1.25, idleScale: 1.00, activeScale: 1.08, stiffness: 900, damping: 54, stretch: 0.17 },
+                switch: { profile: "convex-squircle", bezel: 19, refraction: 1.00, thickness: 47, shrink: 0.26, specular: 0.60, blur: 0.18, saturation: 1.25, idleScale: 1.00, activeScale: 1.50, stiffness: 820, damping: 48, stretch: 0.12 },
+                dock: { profile: "convex-squircle", bezel: 18, refraction: 0.23, thickness: 70, shrink: 0.20, specular: 0.60, blur: 0.00, saturation: 1.22, idleScale: 1.00, activeScale: 1.50, stiffness: 520, damping: 34, stretch: 0.16 },
+                dockContainer: { profile: "convex-squircle", bezel: 18, refraction: 0.92, thickness: 70, shrink: 0.00, specular: 0.60, blur: 0.20, saturation: 1.22, idleScale: 1.00, activeScale: 1.00, stiffness: 520, damping: 34, stretch: 0.00 },
+                segment: { profile: "convex-squircle", bezel: 18, refraction: 0.88, thickness: 40, shrink: 0.20, specular: 0.60, blur: 0.18, saturation: 1.25, idleScale: 1.00, activeScale: 1.62, stiffness: 760, damping: 42, stretch: 0.14 },
+                segmentContainer: { profile: "convex-squircle", bezel: 18, refraction: 0.88, thickness: 68, shrink: 0.02, specular: 0.60, blur: 0.18, saturation: 1.25, idleScale: 1.00, activeScale: 1.00, stiffness: 760, damping: 42, stretch: 0.00 },
+                /* No TPX counterpart -- specular aligned, optics left local. */
+                input: { profile: "convex-squircle", bezel: 18, refraction: 0.72, thickness: 66, shrink: 0.00, specular: 0.60, blur: 0.18, saturation: 1.20, idleScale: 1.00, activeScale: 1.015, stiffness: 580, damping: 32, stretch: 0.08 },
+                volume: { profile: "convex-squircle", bezel: 22, refraction: 0.82, thickness: 90, shrink: 0.00, specular: 0.60, blur: 0.16, saturation: 1.22, idleScale: 1.00, activeScale: 1.02, stiffness: 520, damping: 34, stretch: 0.24 },
+                fab: { profile: "convex-squircle", bezel: 14, refraction: 0.86, thickness: 64, shrink: 0.00, specular: 0.60, blur: 0.16, saturation: 1.22, idleScale: 0.88, activeScale: 1.00, stiffness: 540, damping: 32, stretch: 0.18 },
+                stepper: { profile: "convex-squircle", bezel: 16, refraction: 0.82, thickness: 66, shrink: 0.00, specular: 0.60, blur: 0.16, saturation: 1.24, idleScale: 0.96, activeScale: 1.03, stiffness: 620, damping: 34, stretch: 0.15 },
+            };
+
+            const initialSettings = Object.fromEntries(
+                Object.entries(defaults).map(([key, value]) => [key, { ...value }])
+            );
+
+            const names = {
+                precision: "Precision Lens 精密放大鏡",
+                slider: "Fluid Slider 流體滑桿",
+                switch: "Tactile Switch 觸感開關",
+                dock: "Drag Dock · Selector 拖移 Dock · 選取器",
+                dockContainer: "Drag Dock · Container 拖移 Dock · 容器",
+                segment: "Segment Control · Selector 分段控制項 · 選取器",
+                segmentContainer: "Segment Control · Container 分段控制項 · 容器",
+                input: "Fluid Input 流體文字欄位",
+                volume: "Squish Volume 擠壓音量滑桿",
+                fab: "Layered FAB 分層浮動按鈕",
+                stepper: "Magnetic Stepper 磁吸步進器",
+            };
+
+            const controlDefinitions = [
+                { group: "Optics", key: "profile", label: "Profile", type: "select", options: [
+                    ["convex-circle", "Convex Circle"],
+                    ["convex-squircle", "Convex Squircle"],
+                    ["concave", "Concave"],
+                    ["lip", "Lip"],
+                ] },
+                { group: "Optics", key: "bezel", label: "Bezel", min: 2, max: 42, step: 1, format: (v) => `${v}px` },
+                { group: "Optics", key: "refraction", label: "Refraction", min: 0, max: 2.2, step: 0.01, format: (v) => `${Number(v).toFixed(2)}x` },
+                { group: "Optics", key: "thickness", label: "Thickness", min: 10, max: 220, step: 1, format: (v) => `${v}px` },
+                { group: "Optics", key: "shrink", label: "Center shrink", min: -0.6, max: 0.6, step: 0.01, format: (v) => `${Math.round(Number(v) * 100)}%` },
+                { group: "Optics", key: "specular", label: "Specular", min: 0, max: 0.6, step: 0.01, format: (v) => Number(v).toFixed(2) },
+                { group: "Optics", key: "blur", label: "Blur", min: 0, max: 2, step: 0.01, format: (v) => `${Number(v).toFixed(2)}px` },
+                { group: "Optics", key: "saturation", label: "Saturation", min: 0.5, max: 3, step: 0.01, format: (v) => `${Number(v).toFixed(2)}x` },
+                { group: "Motion", key: "idleScale", label: "Idle scale", min: 0.45, max: 1.2, step: 0.01, format: (v) => Number(v).toFixed(2) },
+                { group: "Motion", key: "activeScale", label: "Active scale", min: 0.6, max: 2, step: 0.01, format: (v) => Number(v).toFixed(2) },
+                { group: "Motion", key: "stiffness", label: "Stiffness", min: 120, max: 1400, step: 10, format: (v) => String(v) },
+                { group: "Motion", key: "damping", label: "Damping", min: 10, max: 90, step: 1, format: (v) => String(v) },
+                { group: "Motion", key: "stretch", label: "Stretch", min: 0, max: 0.4, step: 0.01, format: (v) => Number(v).toFixed(2) },
+            ];
+
+            const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+            const byId = (id) => document.getElementById(id);
+            let selectedComponent = "precision";
+
+            let settings = null;
+            let surfaces = [];
+            function syncDynamicSample(surface) {
+                if (surface.component === "slider") {
+                    const source = byId("sliderFill");
+                    const sample = surface.stageCopy.querySelector(".slider-fill");
+                    if (source && sample) sample.style.width = source.style.width;
+                    return;
+                }
+                if (surface.component === "switch") {
+                    const source = byId("tactileSwitch");
+                    const sample = surface.stageCopy.querySelector(".switch-track");
+                    if (!source || !sample) return;
+                    [
+                        "--switch-progress",
+                        "--switch-track-color",
+                        "--switch-thumb-color",
+                    ].forEach((property) => {
+                        sample.style.setProperty(property, source.style.getPropertyValue(property));
+                    });
+                    sample.classList.toggle("on", source.classList.contains("on"));
+                    return;
+                }
+                if (surface.component === "volume") {
+                    const source = byId("volumeFill");
+                    const sample = surface.stageCopy.querySelector(".volume-fill");
+                    if (source && sample) sample.style.height = source.style.height;
+                    const sourceReservoir = byId("volumeZone")
+                        ?.querySelector(".volume-reservoir");
+                    const sampleReservoir = surface.stageCopy
+                        .querySelector(".volume-reservoir");
+                    if (sourceReservoir && sampleReservoir) {
+                        sampleReservoir.style.transform = sourceReservoir.style.transform;
+                    }
+                }
+            }
+
+
+            function updateKernelPreview() {
+                const surface = surfaces.find((item) => item.component === selectedComponent);
+                if (!surface?.lastMap) return;
+                byId("displacementPreview").src = surface.lastMap;
+                byId("specularPreview").src = surface.lastSpecular;
+                byId("kernelSize").textContent = surface.kernelSize;
+            }
+            const glass = LiquidGlass.mount({
+                root: document,
+                filterDefs: document.querySelector("[data-glass-defs] defs"),
+                settings: initialSettings,
+                onSample: syncDynamicSample,
+                onRebuild: updateKernelPreview,
+            });
+            settings = glass.settings;
+            surfaces = glass.surfaces;
+            const { Spring, runSpringLoop, fastReturn, cutOriginalContentUnderLens } = LiquidGlass;
+            const syncOpticalSurfaces = (component = null) => glass.sync(component);
+            const scheduleFilterRebuild = (component = null) => glass.rebuild(component);
+            updateKernelPreview();
+
+            function buildTuner() {
+                const picker = byId("targetSelect");
+                picker.innerHTML = Object.entries(names)
+                    .map(([value, label]) => `<option value="${value}">${label}</option>`)
+                    .join("");
+                picker.value = selectedComponent;
+                picker.addEventListener("change", () => {
+                    selectedComponent = picker.value;
+                    renderControls();
+                    updateKernelPreview();
+                    const cardTarget = selectedComponent.replace("Container", "");
+                    document.querySelector(`[data-component-card="${cardTarget}"]`)
+                        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+                renderControls();
+            }
+
+            function renderControls() {
+                const root = byId("controls");
+                const groups = selectedComponent.endsWith("Container")
+                    ? ["Optics"]
+                    : ["Optics", "Motion"];
+                root.innerHTML = groups.map((group) => {
+                    const controls = controlDefinitions.filter((item) => item.group === group);
+                    return `
+                        <section class="control-group">
+                            <div class="group-title">${group}</div>
+                            ${controls.map((definition) => {
+                                const output = `<output data-output="${definition.key}"></output>`;
+                                if (definition.type === "select") {
+                                    return `
+                                        <div class="control wide">
+                                            <div class="control-row"><span>${definition.label}</span>${output}</div>
+                                            <select data-setting="${definition.key}">
+                                                ${definition.options.map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}
+                                            </select>
+                                        </div>
+                                    `;
+                                }
+                                return `
+                                    <div class="control">
+                                        <div class="control-row"><span>${definition.label}</span>${output}</div>
+                                        <input type="range" data-setting="${definition.key}" min="${definition.min}" max="${definition.max}" step="${definition.step}">
+                                    </div>
+                                `;
+                            }).join("")}
+                        </section>
+                    `;
+                }).join("");
+
+                root.querySelectorAll("[data-setting]").forEach((input) => {
+                    const key = input.dataset.setting;
+                    const definition = controlDefinitions.find((item) => item.key === key);
+                    input.value = settings[selectedComponent][key];
+                    const output = root.querySelector(`[data-output="${key}"]`);
+                    output.textContent = definition.type === "select"
+                        ? input.selectedOptions[0]?.textContent
+                        : definition.format(settings[selectedComponent][key]);
+                    input.addEventListener("input", () => {
+                        settings[selectedComponent][key] =
+                            definition.type === "select" ? input.value : Number(input.value);
+                        output.textContent = definition.type === "select"
+                            ? input.selectedOptions[0]?.textContent
+                            : definition.format(settings[selectedComponent][key]);
+                        if (definition.group === "Optics") {
+                            scheduleFilterRebuild(selectedComponent);
+                            refreshTunerStatus();
+                        }
+                        refreshSettingsPreview();
+                    });
+                });
+                refreshSettingsPreview();
+            }
+
+            function initPrecisionLens() {
+                const stage = document.querySelector('[data-stage="precision"]');
+                const lens = byId("precisionLens");
+                let dragging = false;
+                let pointerId = null;
+                let offsetX = 0;
+                let offsetY = 0;
+                let lastX = 0;
+                let lastY = 0;
+                let lastTime = 0;
+                const scale = new Spring(settings.precision.idleScale);
+                const stretchX = new Spring(1);
+                const stretchY = new Spring(1);
+
+                const apply = () => {
+                    lens.style.transform =
+                        `scale(${scale.value * stretchX.value}, ${scale.value * stretchY.value})`;
+                };
+
+                const startLoop = () => runSpringLoop(
+                    "precision",
+                    [scale, stretchX, stretchY],
+                    apply,
+                    () => dragging || !scale.settled() || !stretchX.settled() || !stretchY.settled()
+                );
+
+                lens.addEventListener("pointerdown", (event) => {
+                    dragging = true;
+                    pointerId = event.pointerId;
+                    lens.classList.add("dragging");
+                    lens.setPointerCapture(pointerId);
+                    const rect = lens.getBoundingClientRect();
+                    offsetX = event.clientX - rect.left;
+                    offsetY = event.clientY - rect.top;
+                    lastX = event.clientX;
+                    lastY = event.clientY;
+                    lastTime = performance.now();
+                    scale.target = settings.precision.activeScale;
+                    startLoop();
+                });
+
+                lens.addEventListener("pointermove", (event) => {
+                    if (!dragging || event.pointerId !== pointerId) return;
+                    const stageRect = stage.getBoundingClientRect();
+                    const config = settings.precision;
+                    const now = performance.now();
+                    const dt = Math.max(1, now - lastTime) / 1000;
+                    const vx = (event.clientX - lastX) / dt;
+                    const vy = (event.clientY - lastY) / dt;
+                    const speed = Math.hypot(vx, vy) || 1;
+                    const stretch = Math.min(config.stretch, speed / 6000);
+                    stretchX.target = 1 + stretch * Math.abs(vx / speed);
+                    stretchY.target = 1 + stretch * Math.abs(vy / speed);
+                    lens.style.left = `${clamp(
+                        event.clientX - stageRect.left - offsetX,
+                        0,
+                        stage.clientWidth - lens.offsetWidth
+                    )}px`;
+                    lens.style.top = `${clamp(
+                        event.clientY - stageRect.top - offsetY,
+                        0,
+                        stage.clientHeight - lens.offsetHeight
+                    )}px`;
+                    lastX = event.clientX;
+                    lastY = event.clientY;
+                    lastTime = now;
+                    syncOpticalSurfaces("precision");
+                });
+
+                const release = () => {
+                    if (!dragging) return;
+                    dragging = false;
+                    pointerId = null;
+                    lens.classList.remove("dragging");
+                    fastReturn(scale, settings.precision.idleScale);
+                    fastReturn(stretchX, 1);
+                    fastReturn(stretchY, 1);
+                    startLoop();
+                };
+                lens.addEventListener("pointerup", release);
+                lens.addEventListener("pointercancel", release);
+                apply();
+            }
+
+            function initFluidSlider() {
+                const root = byId("fluidSlider");
+                const thumb = byId("sliderThumb");
+                const fill = byId("sliderFill");
+                const scale = new Spring(settings.slider.idleScale);
+                const stretchX = new Spring(1);
+                const stretchY = new Spring(1);
+                const activity = new Spring(0);
+                let dragging = false;
+                let pointerId = null;
+                let value = 0.42;
+                let thumbX = 0;
+                let lastPointerX = 0;
+                let lastTime = 0;
+
+                const travel = () => root.clientWidth - thumb.offsetWidth;
+                const apply = () => {
+                    const center = thumbX + thumb.offsetWidth / 2;
+                    const edgeEpsilon = 0.5;
+                    const atStart = thumbX <= edgeEpsilon;
+                    const atEnd = thumbX >= travel() - edgeEpsilon;
+                    const fillWidth = atStart
+                        ? 0
+                        : atEnd
+                            ? root.clientWidth
+                            : center;
+                    root.classList.toggle("endpoint-transition", atStart || atEnd);
+                    activity.target = dragging ? 1 : 0;
+                    root.classList.toggle("interacting", dragging);
+                    root.style.setProperty(
+                        "--slider-glass",
+                        clamp(activity.value, 0, 1).toFixed(4)
+                    );
+                    fill.style.width = `${fillWidth}px`;
+                    thumb.style.left = `${thumbX}px`;
+                    thumb.style.transform =
+                        `scale(${scale.value * stretchX.value}, ${scale.value * stretchY.value})`;
+                };
+                const start = () => runSpringLoop(
+                    "slider",
+                    [scale, stretchX, stretchY, activity],
+                    apply,
+                    () => dragging || [scale, stretchX, stretchY, activity]
+                        .some((spring) => !spring.settled())
+                );
+                const update = (clientX) => {
+                    const rect = root.getBoundingClientRect();
+                    const now = performance.now();
+                    const dt = Math.max(1, now - lastTime) / 1000;
+                    const velocity = lastTime ? (clientX - lastPointerX) / dt : 0;
+                    value = clamp(
+                        (clientX - rect.left - thumb.offsetWidth / 2) / Math.max(1, travel()),
+                        0,
+                        1
+                    );
+                    thumbX = value * travel();
+                    const amount = Math.min(settings.slider.stretch, Math.abs(velocity) / 5000);
+                    stretchX.target = 1 + amount;
+                    stretchY.target = 1 - amount * 0.45;
+                    lastPointerX = clientX;
+                    lastTime = now;
+                    apply();
+                    syncOpticalSurfaces("slider");
+                };
+                root.addEventListener("pointerdown", (event) => {
+                    if (event.pointerType === "mouse" && event.button !== 0) return;
+                    event.preventDefault();
+                    if (pointerId !== null && pointerId !== event.pointerId) return;
+                    dragging = true;
+                    pointerId = event.pointerId;
+                    lastPointerX = event.clientX;
+                    lastTime = performance.now();
+                    root.setPointerCapture?.(event.pointerId);
+                    activity.value = Math.max(activity.value, 0.18);
+                    activity.target = 1;
+                    scale.target = settings.slider.activeScale;
+                    update(event.clientX);
+                    start();
+                });
+                root.addEventListener("pointermove", (event) => {
+                    if (!dragging || event.pointerId !== pointerId) return;
+                    event.preventDefault();
+                    update(event.clientX);
+                });
+                const release = (event) => {
+                    if (pointerId === null || event.pointerId !== pointerId) return;
+                    const endingPointerId = pointerId;
+                    dragging = false;
+                    pointerId = null;
+                    if (
+                        event.type !== "lostpointercapture"
+                        && root.hasPointerCapture?.(endingPointerId)
+                    ) {
+                        root.releasePointerCapture(endingPointerId);
+                    }
+                    fastReturn(scale, settings.slider.idleScale);
+                    fastReturn(stretchX, 1);
+                    fastReturn(stretchY, 1);
+                    fastReturn(activity, 0, 0.14);
+                    start();
+                };
+                root.addEventListener("pointerup", release);
+                root.addEventListener("pointercancel", release);
+                root.addEventListener("lostpointercapture", release);
+                root.addEventListener("dragstart", (event) => event.preventDefault());
+                new ResizeObserver(() => {
+                    thumbX = value * travel();
+                    apply();
+                    syncOpticalSurfaces("slider");
+                }).observe(root);
+                thumbX = value * travel();
+                apply();
+            }
+
+            function initTactileSwitch() {
+                const track = byId("tactileSwitch");
+                const thumb = byId("switchThumb");
+                const x = new Spring(0);
+                const scale = new Spring(settings.switch.idleScale);
+                const squash = new Spring(1);
+                const activity = new Spring(0);
+                let committed = 1;
+                let pointerActive = false;
+                let dragging = false;
+                let pointerId = null;
+                let startClientX = 0;
+                let startProgress = 1;
+                let pressTime = 0;
+                let pulseTimer = 0;
+                let pulseActive = false;
+                const travel = () => track.clientWidth - thumb.offsetWidth - 10;
+                const progress = () => clamp(x.value / Math.max(1, travel()), 0, 1);
+                const beginSwitchIdleReturn = () => {
+                    fastReturn(scale, settings.switch.idleScale);
+                    fastReturn(squash, 1);
+                    fastReturn(activity, 0, 0.14);
+                };
+                const apply = () => {
+                    const current = progress();
+                    if (!dragging && pointerActive) {
+                        scale.target = settings.switch.activeScale;
+                    }
+                    const trackColor = [30, 34, 40].map((channel, index) => {
+                        const target = [48, 209, 88][index];
+                        return Math.round(channel + (target - channel) * current);
+                    });
+                    /* A click can move the thumb across the whole track. Do
+                       not keep the lens dark for that travel time; the click
+                       owns a short pulse, while a drag owns the pointer hold. */
+                    const glassShapeActive = pointerActive || pulseActive;
+                    if (glassShapeActive) {
+                        activity.target = 1;
+                    } else if (activity.target !== 0) {
+                        fastReturn(activity, 0, 0.14);
+                    }
+                    track.classList.toggle("interacting", glassShapeActive);
+                    track.classList.toggle("on", current >= 0.5);
+                    track.style.setProperty("--switch-progress", current.toFixed(4));
+                    track.style.setProperty(
+                        "--switch-glass",
+                        clamp(activity.value, 0, 1).toFixed(4)
+                    );
+                    track.style.setProperty("--switch-track-color", `rgb(${trackColor.join(" ")})`);
+                    track.style.setProperty("--switch-thumb-color", "rgb(255 255 255)");
+                    thumb.style.left = `${5 + x.value}px`;
+                    thumb.style.transform =
+                        `scale(${scale.value * squash.value}, ${scale.value / squash.value})`;
+                };
+                const start = () => runSpringLoop(
+                    "switch",
+                    [x, scale, squash, activity],
+                    apply,
+                    () => pointerActive || [x, scale, squash, activity]
+                        .some((spring) => !spring.settled())
+                );
+                const beginSwitchPulse = () => {
+                    clearTimeout(pulseTimer);
+                    pulseActive = true;
+                    activity.value = Math.max(activity.value, 0.18);
+                    activity.target = 1;
+                    scale.target = settings.switch.activeScale;
+                    squash.target = 1 + settings.switch.stretch;
+                    start();
+                    pulseTimer = setTimeout(() => {
+                        pulseActive = false;
+                        beginSwitchIdleReturn();
+                        start();
+                    }, 125);
+                };
+                const commit = (next, pulse = false) => {
+                    committed = next >= 0.5 ? 1 : 0;
+                    track.setAttribute("aria-pressed", String(Boolean(committed)));
+                    x.target = committed * travel();
+                    if (pulse) {
+                        beginSwitchPulse();
+                    } else {
+                        activity.value = Math.max(activity.value, 0.55);
+                        activity.target = 1;
+                        start();
+                    }
+                };
+                track.addEventListener("pointerdown", (event) => {
+                    if (event.pointerType === "mouse" && event.button !== 0) return;
+                    clearTimeout(pulseTimer);
+                    pulseActive = false;
+                    pointerActive = true;
+                    dragging = false;
+                    pointerId = event.pointerId;
+                    startClientX = event.clientX;
+                    startProgress = progress();
+                    pressTime = performance.now();
+                    track.setPointerCapture?.(event.pointerId);
+                    activity.value = Math.max(activity.value, 0.18);
+                    activity.target = 1;
+                    scale.target = settings.switch.activeScale;
+                    squash.target = 1 + settings.switch.stretch;
+                    start();
+                });
+                track.addEventListener("pointermove", (event) => {
+                    if (!pointerActive || event.pointerId !== pointerId) return;
+                    const dx = event.clientX - startClientX;
+                    if (!dragging && Math.abs(dx) <= 6) return;
+                    dragging = true;
+                    const next = clamp(startProgress + dx / Math.max(1, travel()), 0, 1);
+                    const previous = x.value;
+                    x.value = x.target = next * travel();
+                    x.velocity = (x.value - previous) * 18;
+                    squash.target = 1 + Math.min(
+                        settings.switch.stretch,
+                        Math.abs(x.velocity) / Math.max(1, travel() * 24)
+                    );
+                    apply();
+                    syncOpticalSurfaces("switch");
+                });
+                const release = (event) => {
+                    if (!pointerActive || event.pointerId !== pointerId) return;
+                    const cancelled = event.type === "pointercancel";
+                    const elapsed = performance.now() - pressTime;
+                    const distance = Math.abs(event.clientX - startClientX);
+                    const wasDragging = dragging;
+                    pointerActive = false;
+                    dragging = false;
+                    pointerId = null;
+                    if (track.hasPointerCapture?.(event.pointerId)) {
+                        track.releasePointerCapture(event.pointerId);
+                    }
+                    let next = committed;
+                    let pulse = false;
+                    if (wasDragging) next = progress() >= 0.5 ? 1 : 0;
+                    else if (!cancelled && elapsed <= 500 && distance <= 6) {
+                        next = committed ? 0 : 1;
+                        pulse = true;
+                    }
+                    commit(next, pulse);
+                    if (!pulse) {
+                        beginSwitchIdleReturn();
+                        start();
+                    }
+                };
+                track.addEventListener("pointerup", release);
+                track.addEventListener("pointercancel", release);
+                track.addEventListener("lostpointercapture", (event) => {
+                    if (pointerActive) release(event);
+                });
+                track.addEventListener("keydown", (event) => {
+                    if (event.key !== " " && event.key !== "Enter") return;
+                    event.preventDefault();
+                    commit(committed ? 0 : 1, true);
+                });
+                new ResizeObserver(() => {
+                    if (!pointerActive) {
+                        x.value = x.target = committed * travel();
+                        apply();
+                        syncOpticalSurfaces("switch");
+                    }
+                }).observe(track);
+                x.value = x.target = travel();
+                apply();
+            }
+
+            function initDragDock() {
+                const dock = byId("dragDock");
+                const bubble = byId("dockBubble");
+                const buttons = Array.from(dock.children)
+                    .filter((node) => node.matches("[data-dock-index]"));
+                const contentLayers = buttons.map(
+                    (button) => button.querySelector(".control-source-content")
+                );
+                const x = new Spring(0);
+                const scale = new Spring(settings.dock.idleScale);
+                const stretch = new Spring(1);
+                const activity = new Spring(0);
+                let pointerActive = false;
+                let dragging = false;
+                let pointerId = null;
+                let startClientX = 0;
+                let pressTime = 0;
+                let ignoreClickUntil = 0;
+                let selected = 2;
+                let maskActive = false;
+                let releaseTimer = 0;
+                let returningFlat = false;
+                const dragDelayMs = 140;
+                const dragDistancePx = 10;
+                const cell = () => (dock.clientWidth - 14) / buttons.length;
+                const targetFor = (index) => index * cell();
+                const apply = () => {
+                    const moving = [x, scale, stretch]
+                        .some((spring) => !spring.settled(0.002));
+                    const glassShapeActive = (dragging || moving) && !returningFlat;
+                    if (glassShapeActive) {
+                        activity.target = 1;
+                        maskActive = true;
+                    } else if (activity.target !== 0) {
+                        fastReturn(activity, 0, 0.14);
+                    }
+                    if (activity.target === 0 && activity.value <= 0.002) {
+                        activity.value = 0;
+                        activity.velocity = 0;
+                        maskActive = false;
+                    }
+                    const glassOpacity = clamp(activity.value, 0, 1);
+                    bubble.style.left = `${7 + x.value}px`;
+                    bubble.style.transform =
+                        `scale(${scale.value * stretch.value}, ${scale.value / stretch.value})`;
+                    syncOpticalSurfaces("dock");
+                    cutOriginalContentUnderLens(
+                        contentLayers,
+                        bubble,
+                        maskActive
+                    );
+                    dock.classList.toggle("interacting", glassShapeActive);
+                    dock.style.setProperty("--control-glass", glassOpacity.toFixed(4));
+                    /* The refracted label must live and die with the hole cut
+                       in the real one, not with the backdrop fade. Position
+                       and clip the two layers first, then hand off visibility;
+                       this prevents one compositor frame of the old clone
+                       appearing above the live label at interaction start. */
+                    dock.style.setProperty(
+                        "--control-content",
+                        maskActive ? "1" : "0"
+                    );
+                };
+                const start = () => runSpringLoop(
+                    "dock",
+                    [x, scale, stretch, activity],
+                    apply,
+                    () => dragging || [x, scale, stretch, activity]
+                        .some((spring) => !spring.settled())
+                );
+                const beginIdleReturn = () => {
+                    returningFlat = true;
+                    fastReturn(activity, 0, 0.14);
+                    fastReturn(scale, settings.dock.idleScale);
+                    fastReturn(stretch, 1);
+                    start();
+                };
+                const pulse = () => {
+                    clearTimeout(releaseTimer);
+                    returningFlat = false;
+                    maskActive = true;
+                    activity.value = Math.max(activity.value, 0.18);
+                    activity.target = 1;
+                    scale.target = settings.dock.activeScale;
+                    start();
+                    releaseTimer = setTimeout(beginIdleReturn, 110);
+                };
+                const select = (index, animate = true) => {
+                    selected = clamp(index, 0, buttons.length - 1);
+                    x.target = targetFor(selected);
+                    buttons.forEach((button, i) => button.classList.toggle("active", i === selected));
+                    if (animate) pulse();
+                    start();
+                };
+                buttons.forEach((button, index) => {
+                    button.addEventListener("click", () => {
+                        if (performance.now() < ignoreClickUntil) return;
+                        select(index);
+                    });
+                });
+                dock.addEventListener("pointerdown", (event) => {
+                    if (event.pointerType === "mouse" && event.button !== 0) return;
+                    pointerActive = true;
+                    dragging = false;
+                    pointerId = event.pointerId;
+                    startClientX = event.clientX;
+                    pressTime = performance.now();
+                });
+                dock.addEventListener("pointermove", (event) => {
+                    if (!pointerActive || event.pointerId !== pointerId) return;
+                    const dx = event.clientX - startClientX;
+                    if (!dragging) {
+                        const elapsed = performance.now() - pressTime;
+                        if (elapsed < dragDelayMs || Math.abs(dx) < dragDistancePx) return;
+                        dragging = true;
+                        dock.setPointerCapture?.(event.pointerId);
+                        clearTimeout(releaseTimer);
+                        returningFlat = false;
+                        scale.target = settings.dock.activeScale;
+                        start();
+                    }
+                    const rect = dock.getBoundingClientRect();
+                    const raw = clamp(
+                        event.clientX - rect.left - 7 - cell() / 2,
+                        0,
+                        cell() * (buttons.length - 1)
+                    );
+                    const velocity = raw - x.target;
+                    x.target = raw;
+                    stretch.target = 1 + Math.min(settings.dock.stretch, Math.abs(velocity) / 80);
+                    selected = Math.round(raw / cell());
+                });
+                const release = (event) => {
+                    if (!pointerActive || event.pointerId !== pointerId) return;
+                    const wasDragging = dragging;
+                    pointerActive = false;
+                    dragging = false;
+                    pointerId = null;
+                    if (dock.hasPointerCapture?.(event.pointerId)) {
+                        dock.releasePointerCapture(event.pointerId);
+                    }
+                    if (!wasDragging) return;
+                    ignoreClickUntil = performance.now() + 220;
+                    beginIdleReturn();
+                    select(selected, false);
+                };
+                dock.addEventListener("pointerup", release);
+                dock.addEventListener("pointercancel", release);
+                new ResizeObserver(() => {
+                    x.value = x.target = targetFor(selected);
+                    apply();
+                    syncOpticalSurfaces("dock");
+                }).observe(dock);
+                x.value = x.target = targetFor(selected);
+                apply();
+            }
+
+            function initSegmentControl() {
+                const track = byId("segmentControl");
+                const indicator = byId("segmentIndicator");
+                const buttons = Array.from(track.children)
+                    .filter((node) => node.matches("[data-segment-index]"));
+                const contentLayers = buttons.map(
+                    (button) => button.querySelector(".control-source-content")
+                );
+                const x = new Spring(0);
+                const scale = new Spring(settings.segment.idleScale);
+                const stretch = new Spring(1);
+                const activity = new Spring(0);
+                let selected = 2;
+                let maskActive = false;
+                let returningFlat = true;
+                const cell = () => (track.clientWidth - 8) / buttons.length;
+                const apply = () => {
+                    const positionMoving = !x.settled(0.002);
+                    const remaining = Math.abs(x.target - x.value);
+                    if (
+                        positionMoving
+                        && !returningFlat
+                        && remaining <= cell() * 0.24
+                    ) {
+                        returningFlat = true;
+                    }
+                    const glassShapeActive = positionMoving && !returningFlat;
+                    if (glassShapeActive) {
+                        activity.target = 1;
+                        maskActive = true;
+                    } else if (activity.target !== 0) {
+                        fastReturn(activity, 0, 0.14);
+                    }
+                    if (activity.target === 0 && activity.value <= 0.002) {
+                        activity.value = 0;
+                        activity.velocity = 0;
+                        maskActive = false;
+                    }
+                    const glassOpacity = clamp(activity.value, 0, 1);
+                    indicator.style.left = `${4 + x.value}px`;
+                    indicator.style.transform =
+                        `scale(${scale.value * stretch.value}, ${scale.value / stretch.value})`;
+                    syncOpticalSurfaces("segment");
+                    cutOriginalContentUnderLens(
+                        contentLayers,
+                        indicator,
+                        maskActive
+                    );
+                    track.classList.toggle("interacting", glassShapeActive);
+                    track.style.setProperty("--control-glass", glassOpacity.toFixed(4));
+                    /* The refracted label must live and die with the hole cut
+                       in the real one, not with the backdrop fade. Position
+                       and clip the two layers first, then hand off visibility;
+                       this prevents one compositor frame of the old clone
+                       appearing above the live label at interaction start. */
+                    track.style.setProperty(
+                        "--control-content",
+                        maskActive ? "1" : "0"
+                    );
+                };
+                const start = () => runSpringLoop(
+                    "segment",
+                    [x, scale, stretch, activity],
+                    apply
+                );
+                buttons.forEach((button, index) => {
+                    button.addEventListener("click", () => {
+                        if (index === selected) return;
+                        selected = index;
+                        returningFlat = false;
+                        x.target = selected * cell();
+                        maskActive = true;
+                        activity.value = Math.max(activity.value, 0.18);
+                        activity.target = 1;
+                        start();
+                    });
+                });
+                new ResizeObserver(() => {
+                    x.value = x.target = selected * cell();
+                    apply();
+                    syncOpticalSurfaces("segment");
+                }).observe(track);
+                x.value = x.target = selected * cell();
+                apply();
+            }
+
+            function initFluidInput() {
+                const shell = byId("fluidInputShell");
+                const input = byId("fluidInput");
+                const shakeX = new Spring(0);
+                const shakeY = new Spring(0);
+                const scale = new Spring(settings.input.idleScale);
+                const apply = () => {
+                    shell.style.left = `${shakeX.value}px`;
+                    shell.style.top = `${shakeY.value}px`;
+                    shell.style.transform = `scale(${scale.value})`;
+                };
+                const start = () => runSpringLoop("input", [shakeX, shakeY, scale], apply);
+                input.addEventListener("focus", () => {
+                    scale.target = settings.input.activeScale;
+                    start();
+                });
+                input.addEventListener("blur", () => {
+                    fastReturn(scale, settings.input.idleScale);
+                    start();
+                });
+                input.addEventListener("input", () => {
+                    const impulse = 65 * settings.input.stretch;
+                    shakeX.velocity += (Math.random() - 0.5) * impulse;
+                    shakeY.velocity += (Math.random() - 0.5) * impulse * 0.65;
+                    scale.velocity += settings.input.stretch * 0.7;
+                    shakeX.target = 0;
+                    shakeY.target = 0;
+                    start();
+                });
+                apply();
+            }
+
+            function initSquishVolume() {
+                const zone = byId("volumeZone");
+                const glass = byId("volumeGlass");
+                const reservoir = zone.querySelector(".volume-reservoir");
+                const fill = byId("volumeFill");
+                const glassFill = byId("volumeGlassFill");
+                const yScale = new Spring(settings.volume.idleScale);
+                const xScale = new Spring(settings.volume.idleScale);
+                let dragging = false;
+                let pointerId = null;
+                let value = 0.52;
+                const apply = () => {
+                    fill.style.height = `${value * 100}%`;
+                    glassFill.style.height = `${value * 100}%`;
+                    zone.setAttribute("aria-valuenow", String(Math.round(value * 100)));
+                    const transform = `scale(${xScale.value}, ${yScale.value})`;
+                    reservoir.style.transform = transform;
+                    glass.style.transform = transform;
+                };
+                const start = () => runSpringLoop(
+                    "volume",
+                    [xScale, yScale],
+                    apply,
+                    () => dragging || !xScale.settled() || !yScale.settled()
+                );
+                const update = (clientY) => {
+                    const rect = zone.getBoundingClientRect();
+                    const capsuleTop = rect.top + 10;
+                    const capsuleHeight = Math.max(1, rect.height - 20);
+                    const normalized = 1 - (clientY - capsuleTop) / capsuleHeight;
+                    value = clamp(normalized, 0, 1);
+                    const over = normalized < 0
+                        ? -normalized
+                        : normalized > 1 ? normalized - 1 : 0;
+                    yScale.target =
+                        settings.volume.activeScale
+                        + Math.min(settings.volume.stretch, over * 0.65);
+                    xScale.target =
+                        settings.volume.activeScale
+                        - Math.min(settings.volume.stretch * 0.35, over * 0.2);
+                    apply();
+                    syncOpticalSurfaces("volume");
+                };
+                zone.addEventListener("pointerdown", (event) => {
+                    if (event.pointerType === "mouse" && event.button !== 0) return;
+                    dragging = true;
+                    pointerId = event.pointerId;
+                    zone.classList.add("dragging");
+                    zone.setPointerCapture?.(event.pointerId);
+                    update(event.clientY);
+                    start();
+                });
+                zone.addEventListener("pointermove", (event) => {
+                    if (dragging && event.pointerId === pointerId) update(event.clientY);
+                });
+                const release = (event) => {
+                    if (!dragging || event.pointerId !== pointerId) return;
+                    dragging = false;
+                    pointerId = null;
+                    zone.classList.remove("dragging");
+                    if (zone.hasPointerCapture?.(event.pointerId)) {
+                        zone.releasePointerCapture(event.pointerId);
+                    }
+                    fastReturn(xScale, settings.volume.idleScale);
+                    fastReturn(yScale, settings.volume.idleScale);
+                    start();
+                };
+                zone.addEventListener("pointerup", release);
+                zone.addEventListener("pointercancel", release);
+                zone.addEventListener("keydown", (event) => {
+                    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+                    event.preventDefault();
+                    value = clamp(value + (event.key === "ArrowUp" ? 0.05 : -0.05), 0, 1);
+                    xScale.value = settings.volume.activeScale;
+                    yScale.value = settings.volume.activeScale;
+                    fastReturn(xScale, settings.volume.idleScale);
+                    fastReturn(yScale, settings.volume.idleScale);
+                    apply();
+                    start();
+                });
+                apply();
+            }
+
+            function initLayeredFab() {
+                const main = byId("fabButton");
+                const mainContent = main.querySelector(".surface-content");
+                const actions = Array.from(main.parentElement.children)
+                    .filter((node) => node.matches("[data-fab-action]"));
+                const progress = new Spring(0);
+                const press = new Spring(settings.fab.idleScale);
+                let open = false;
+                const apply = () => {
+                    main.style.transform = `scale(${press.value})`;
+                    mainContent.style.transform = `rotate(${progress.value * 90}deg)`;
+                    actions.forEach((action, index) => {
+                        const distance = 70 * (index + 1);
+                        const closedBottom =
+                            14 + (main.offsetHeight - action.offsetHeight) / 2;
+                        const delay = index * 0.08;
+                        const p = clamp(
+                            (progress.value - delay) / Math.max(0.01, 1 - delay),
+                            0,
+                            1
+                        );
+                        action.style.opacity = String(p);
+                        action.style.bottom = `${closedBottom + distance * p}px`;
+                        action.style.transform = `scale(${0.55 + p * 0.45})`;
+                        action.classList.toggle("open", p > 0.8);
+                    });
+                };
+                const start = () => runSpringLoop("fab", [progress, press], apply);
+                main.addEventListener("pointerdown", () => {
+                    press.target = settings.fab.activeScale;
+                    start();
+                });
+                main.addEventListener("pointerup", () => {
+                    fastReturn(press, settings.fab.idleScale);
+                    start();
+                });
+                main.addEventListener("click", () => {
+                    open = !open;
+                    main.setAttribute("aria-expanded", String(open));
+                    progress.target = open ? 1 : 0;
+                    progress.velocity += (open ? 1 : -1) * settings.fab.stretch * 3;
+                    start();
+                });
+                apply();
+            }
+
+            function initMagneticStepper() {
+                const stepper = byId("magneticStepper");
+                const output = byId("stepValue");
+                const shift = new Spring(0);
+                const scale = new Spring(settings.stepper.idleScale);
+                let value = 2;
+                const apply = () => {
+                    stepper.style.left = `${shift.value}px`;
+                    stepper.style.transform = `scale(${scale.value})`;
+                };
+                const start = () => runSpringLoop("stepper", [shift, scale], apply);
+                const change = (delta) => {
+                    value += delta;
+                    output.textContent = String(value);
+                    shift.velocity += delta * settings.stepper.stretch * 90;
+                    shift.target = 0;
+                    scale.value = settings.stepper.activeScale;
+                    fastReturn(scale, settings.stepper.idleScale);
+                    start();
+                };
+                byId("stepDown").addEventListener("click", () => change(-1));
+                byId("stepUp").addEventListener("click", () => change(1));
+                apply();
+            }
+
+            function initInteractions() {
+                initPrecisionLens();
+                initFluidSlider();
+                initTactileSwitch();
+                initDragDock();
+                initSegmentControl();
+                initFluidInput();
+                initSquishVolume();
+                initLayeredFab();
+                initMagneticStepper();
+            }
+
+            byId("resetButton").addEventListener("click", () => {
+                settings[selectedComponent] = { ...defaults[selectedComponent] };
+                renderControls();
+                scheduleFilterRebuild(selectedComponent);
+                refreshTunerStatus();
+            });
+
+            /* Export only what differs from the shipped defaults, so the file
+               you paste back into the `defaults` table is a diff rather than a
+               wall of unchanged numbers. */
+            function exportTuning() {
+                const out = {};
+                Object.entries(settings).forEach(([component, values]) => {
+                    const base = defaults[component] || {};
+                    const diff = {};
+                    Object.entries(values).forEach(([key, value]) => {
+                        if (base[key] !== value) diff[key] = value;
+                    });
+                    if (Object.keys(diff).length) out[component] = diff;
+                });
+                return JSON.stringify(out, null, 4);
+            }
+
+            function refreshSettingsPreview() {
+                const preview = byId("settingsPreview");
+                if (!preview || !settings || !settings[selectedComponent]) return;
+                preview.textContent = JSON.stringify({
+                    component: selectedComponent,
+                    settings: settings[selectedComponent],
+                }, null, 2);
+            }
+
+            function countChangedFields() {
+                return Object.entries(settings).reduce((total, [component, values]) => {
+                    const base = defaults[component] || {};
+                    return total + Object.entries(values)
+                        .filter(([key, value]) => base[key] !== value).length;
+                }, 0);
+            }
+
+            function refreshTunerStatus(message) {
+                const status = byId("tunerStatus");
+                if (message) {
+                    status.textContent = message;
+                    return;
+                }
+                const changed = countChangedFields();
+                status.textContent = changed
+                    ? `${changed} field${changed > 1 ? "s" : ""} changed · save to keep`
+                    : "matching shipped defaults";
+                status.classList.toggle("is-dirty", changed > 0);
+            }
+
+            function flash(button, text) {
+                const previous = button.textContent;
+                button.textContent = text;
+                setTimeout(() => { button.textContent = previous; }, 1400);
+            }
+
+            byId("saveButton").addEventListener("click", () => {
+                const changed = countChangedFields();
+                if (!changed) {
+                    refreshTunerStatus("nothing to save — all values are default");
+                    setTimeout(() => refreshTunerStatus(), 1600);
+                    return;
+                }
+                const blob = new Blob([exportTuning()], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "liquid-glass-tuning.json";
+                link.click();
+                URL.revokeObjectURL(url);
+                flash(byId("saveButton"), "Saved");
+            });
+
+            byId("copyButton").addEventListener("click", async () => {
+                const json = exportTuning();
+                try {
+                    await navigator.clipboard.writeText(json);
+                    flash(byId("copyButton"), "Copied");
+                } catch (error) {
+                    /* Clipboard needs a secure context; file:// has none. */
+                    console.log("[Liquid Glass] tuning:\n" + json);
+                    flash(byId("copyButton"), "In console");
+                }
+            });
+
+            byId("loadButton").addEventListener("click", () => byId("loadInput").click());
+
+            byId("loadInput").addEventListener("change", (event) => {
+                const file = event.target.files && event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    let parsed;
+                    try {
+                        parsed = JSON.parse(String(reader.result));
+                    } catch (error) {
+                        refreshTunerStatus("could not parse that file as JSON");
+                        return;
+                    }
+                    /* Merge onto defaults, not onto current settings: loading a
+                       file should reproduce exactly what was saved, not stack on
+                       top of whatever is in the panel right now. */
+                    let applied = 0;
+                    Object.keys(defaults).forEach((component) => {
+                        settings[component] = { ...defaults[component] };
+                    });
+                    Object.entries(parsed).forEach(([component, values]) => {
+                        if (!settings[component] || !values || typeof values !== "object") return;
+                        Object.entries(values).forEach(([key, value]) => {
+                            if (!(key in settings[component])) return;
+                            settings[component][key] = value;
+                            applied += 1;
+                        });
+                    });
+                    renderControls();
+                    scheduleFilterRebuild();
+                    refreshTunerStatus(`loaded ${applied} field${applied === 1 ? "" : "s"}`);
+                    setTimeout(() => refreshTunerStatus(), 1600);
+                };
+                reader.readAsText(file);
+                event.target.value = "";
+            });
+
+            buildTuner();
+            initInteractions();
+        })();
+    </script>
+</body>
+</html>
