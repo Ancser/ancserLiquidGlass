@@ -11,7 +11,8 @@ Codex skill。網站首頁保持互動 gallery 與左側 tuner；README 只負�
 - `01–09` 九個公開元件：Precision Lens、Fluid Slider、Tactile Switch、Drag Dock、Segment Control、Fluid Input、Squish Volume、Layered FAB、Magnetic Stepper。
 - 光學參數：bezel、refraction、thickness、shrink、specular、blur、saturation。
 - 動態參數：idle scale、active scale、stiffness、damping、stretch。
-- `Save / Copy / Load` 與 Current settings 預覽，方便把目前調好的數值帶到自己的元件。
+- `Save / Copy / Load / Share` 與 Current settings 預覽，方便把目前調好的數值帶到自己的元件。
+- `Share` 會把目前元件與調參差異放進網址 hash；別人打開分享連結就會載入同一組設定，不需要 server。
 
 ## Usage
 
@@ -78,8 +79,10 @@ Codex skill。網站首頁保持互動 gallery 與左側 tuner；README 只負�
 
 ## GitHub Pages
 
-在 repository 的 **Settings → Pages** 選擇 **Deploy from a branch**，
-branch 選 `main`、folder 選 `/ (root)`。根目錄的 `index.html` 會直接成為網站入口。
+repository 已包含 `.github/workflows/pages.yml`。在 **Settings → Pages** 的
+**Build and deployment → Source** 選擇 **GitHub Actions**；之後每次 push 到
+`main` 都會自動部署。網站入口仍是根目錄的 `index.html`，預期網址為：
+`https://ancser.github.io/ancserLiquidGlass/`。
 
 ## 本機預覽
 
