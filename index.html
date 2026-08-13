@@ -60,7 +60,10 @@
 
         .app {
             display: grid;
-            grid-template-columns: 330px minmax(0, 1fr);
+            /* The tuner carries English + Traditional Chinese labels. Keep
+               enough width for both without forcing selects or headings to
+               overflow into the gallery. */
+            grid-template-columns: 495px minmax(0, 1fr);
             min-height: 100vh;
         }
 
@@ -69,21 +72,27 @@
             top: 0;
             height: 100vh;
             overflow: auto;
-            padding: 22px 18px;
+            padding: 30px 28px 36px;
             border-right: 1px solid var(--line);
             background: #08090d;
         }
 
         .tuner h1 {
             margin: 0 0 6px;
-            font-size: 24px;
-            letter-spacing: -0.045em;
+            font-size: 48px;
+            line-height: 1.05;
+            letter-spacing: -0.08em;
+            white-space: normal;
+        }
+
+        .tuner h1 span {
+            display: block;
         }
 
         .tuner-copy {
             margin: 0 0 16px;
             color: var(--muted);
-            font-size: 12px;
+            font-size: 24px;
             line-height: 1.5;
         }
 
@@ -96,7 +105,7 @@
         .target-picker label,
         .group-title {
             color: #a9aab3;
-            font-size: 10px;
+            font-size: 20px;
             font-weight: 850;
             letter-spacing: 0.12em;
             text-transform: uppercase;
@@ -110,6 +119,7 @@
             color: #fff;
             background: #111218;
             outline: none;
+            font-size: 32px;
         }
 
         .control-groups {
@@ -147,7 +157,7 @@
             gap: 6px;
             margin-bottom: 7px;
             color: #aaaab4;
-            font-size: 9px;
+            font-size: 18px;
             font-weight: 850;
             letter-spacing: 0.07em;
             text-transform: uppercase;
@@ -155,7 +165,7 @@
 
         .control output {
             color: #fff;
-            font-size: 10px;
+            font-size: 20px;
             letter-spacing: 0;
             text-transform: none;
             white-space: nowrap;
@@ -175,7 +185,7 @@
             color: #fff;
             background: #090a0f;
             outline: none;
-            font-size: 11px;
+            font-size: 22px;
         }
 
         .kernel {
@@ -192,7 +202,7 @@
             gap: 8px;
             margin-bottom: 8px;
             color: #aaaab4;
-            font-size: 10px;
+            font-size: 20px;
             font-weight: 850;
             letter-spacing: 0.08em;
             text-transform: uppercase;
@@ -223,6 +233,7 @@
             color: #fff;
             background: #14151b;
             cursor: pointer;
+            font-size: 32px;
             font-weight: 800;
         }
 
@@ -379,7 +390,7 @@
             color: var(--text);
             background: var(--panel);
             font: inherit;
-            font-size: 12px;
+            font-size: 24px;
             font-weight: 700;
             letter-spacing: 0.04em;
             text-transform: uppercase;
@@ -393,7 +404,7 @@
         .tuner-io-status {
             margin: 8px 0 0;
             color: var(--muted);
-            font-size: 11px;
+            font-size: 22px;
             line-height: 1.4;
         }
 
@@ -412,7 +423,7 @@
             padding: 8px 10px;
             color: #aaaab4;
             cursor: pointer;
-            font-size: 10px;
+            font-size: 20px;
             font-weight: 850;
             letter-spacing: 0.08em;
             text-transform: uppercase;
@@ -1049,6 +1060,58 @@
                 grid-template-columns: 280px minmax(0, 1fr);
             }
 
+            .tuner {
+                padding: 22px 18px;
+            }
+
+            .tuner h1 {
+                font-size: 24px;
+                letter-spacing: -0.045em;
+                white-space: normal;
+            }
+
+            .tuner-copy {
+                font-size: 12px;
+            }
+
+            .target-picker label,
+            .group-title {
+                font-size: 10px;
+            }
+
+            .target-picker select {
+                font-size: 16px;
+            }
+
+            .control-row {
+                font-size: 9px;
+            }
+
+            .control output {
+                font-size: 10px;
+            }
+
+            .control select {
+                font-size: 11px;
+            }
+
+            .kernel-head {
+                font-size: 10px;
+            }
+
+            .reset {
+                font-size: 16px;
+            }
+
+            .tuner-io-btn {
+                font-size: 12px;
+            }
+
+            .tuner-io-status,
+            .settings-preview summary {
+                font-size: 11px;
+            }
+
             .exhibit-grid {
                 grid-template-columns: 1fr;
             }
@@ -1109,11 +1172,11 @@
 
     <div class="app">
         <aside class="tuner">
-            <h1>Liquid Optics Core</h1>
-            <p class="tuner-copy">Each component keeps an independent optical kernel and motion preset.</p>
+            <h1><span>Liquid Optics Core</span><span lang="zh-Hant">液態光學核心</span></h1>
+            <p class="tuner-copy">Each component keeps an independent optical kernel and motion preset. 每個元件都有獨立的光學核心與動態預設。</p>
 
             <div class="target-picker">
-                <label for="targetSelect">Target component</label>
+                <label for="targetSelect">Target component 目標元件</label>
                 <select id="targetSelect"></select>
             </div>
 
@@ -1121,26 +1184,26 @@
 
             <div class="kernel">
                 <div class="kernel-head">
-                    <span>Selected kernel</span>
+                    <span>Selected kernel 已選核心</span>
                     <span id="kernelSize">—</span>
                 </div>
                 <div class="kernel-grid">
-                    <img id="displacementPreview" alt="RG displacement map">
-                    <img id="specularPreview" alt="Specular map">
+                    <img id="displacementPreview" alt="RG displacement map RG 位移圖">
+                    <img id="specularPreview" alt="Specular map 高光圖">
                 </div>
             </div>
 
-            <button class="reset" id="resetButton" type="button">Reset selected component</button>
+            <button class="reset" id="resetButton" type="button">Reset selected component 重設目前元件</button>
 
             <div class="tuner-io">
                 <div class="tuner-io-row">
-                    <button class="tuner-io-btn" id="saveButton" type="button">Save</button>
-                    <button class="tuner-io-btn" id="copyButton" type="button">Copy</button>
-                    <button class="tuner-io-btn" id="loadButton" type="button">Load</button>
+                    <button class="tuner-io-btn" id="saveButton" type="button">Save 儲存</button>
+                    <button class="tuner-io-btn" id="copyButton" type="button">Copy 複製</button>
+                    <button class="tuner-io-btn" id="loadButton" type="button">Load 載入</button>
                 </div>
-                <p class="tuner-io-status" id="tunerStatus">matching shipped defaults</p>
+                <p class="tuner-io-status" id="tunerStatus">matching shipped defaults 符合出廠預設</p>
                 <details class="settings-preview" open>
-                    <summary>Current settings</summary>
+                    <summary>Current settings 目前設定</summary>
                     <pre id="settingsPreview"></pre>
                 </details>
                 <input id="loadInput" type="file" accept="application/json,.json" hidden>
@@ -1361,38 +1424,38 @@
             );
 
             const names = {
-                precision: "Precision Lens 精密放大鏡",
-                slider: "Fluid Slider 流體滑桿",
-                switch: "Tactile Switch 觸感開關",
-                dock: "Drag Dock · Selector 拖移 Dock · 選取器",
-                dockContainer: "Drag Dock · Container 拖移 Dock · 容器",
-                segment: "Segment Control · Selector 分段控制項 · 選取器",
-                segmentContainer: "Segment Control · Container 分段控制項 · 容器",
-                input: "Fluid Input 流體文字欄位",
-                volume: "Squish Volume 擠壓音量滑桿",
-                fab: "Layered FAB 分層浮動按鈕",
-                stepper: "Magnetic Stepper 磁吸步進器",
+                precision: "01 · Precision Lens 精密放大鏡",
+                slider: "02 · Fluid Slider 流體滑桿",
+                switch: "03 · Tactile Switch 觸感開關",
+                dock: "04a · Drag Dock · Selector 拖移 Dock · 選取器",
+                dockContainer: "04b · Drag Dock · Container 拖移 Dock · 容器",
+                segment: "05a · Segment Control · Selector 分段控制項 · 選取器",
+                segmentContainer: "05b · Segment Control · Container 分段控制項 · 容器",
+                input: "06 · Fluid Input 流體文字欄位",
+                volume: "07 · Squish Volume 擠壓音量滑桿",
+                fab: "08 · Layered FAB 分層浮動按鈕",
+                stepper: "09 · Magnetic Stepper 磁吸步進器",
             };
 
             const controlDefinitions = [
-                { group: "Optics", key: "profile", label: "Profile", type: "select", options: [
-                    ["convex-circle", "Convex Circle"],
-                    ["convex-squircle", "Convex Squircle"],
-                    ["concave", "Concave"],
-                    ["lip", "Lip"],
+                { group: "Optics 光學", key: "profile", label: "Profile 輪廓", type: "select", options: [
+                    ["convex-circle", "Convex Circle 凸圓"],
+                    ["convex-squircle", "Convex Squircle 凸方圓"],
+                    ["concave", "Concave 凹面"],
+                    ["lip", "Lip 唇緣"],
                 ] },
-                { group: "Optics", key: "bezel", label: "Bezel", min: 2, max: 42, step: 1, format: (v) => `${v}px` },
-                { group: "Optics", key: "refraction", label: "Refraction", min: 0, max: 2.2, step: 0.01, format: (v) => `${Number(v).toFixed(2)}x` },
-                { group: "Optics", key: "thickness", label: "Thickness", min: 10, max: 220, step: 1, format: (v) => `${v}px` },
-                { group: "Optics", key: "shrink", label: "Center shrink", min: -0.6, max: 0.6, step: 0.01, format: (v) => `${Math.round(Number(v) * 100)}%` },
-                { group: "Optics", key: "specular", label: "Specular", min: 0, max: 0.6, step: 0.01, format: (v) => Number(v).toFixed(2) },
-                { group: "Optics", key: "blur", label: "Blur", min: 0, max: 2, step: 0.01, format: (v) => `${Number(v).toFixed(2)}px` },
-                { group: "Optics", key: "saturation", label: "Saturation", min: 0.5, max: 3, step: 0.01, format: (v) => `${Number(v).toFixed(2)}x` },
-                { group: "Motion", key: "idleScale", label: "Idle scale", min: 0.45, max: 1.2, step: 0.01, format: (v) => Number(v).toFixed(2) },
-                { group: "Motion", key: "activeScale", label: "Active scale", min: 0.6, max: 2, step: 0.01, format: (v) => Number(v).toFixed(2) },
-                { group: "Motion", key: "stiffness", label: "Stiffness", min: 120, max: 1400, step: 10, format: (v) => String(v) },
-                { group: "Motion", key: "damping", label: "Damping", min: 10, max: 90, step: 1, format: (v) => String(v) },
-                { group: "Motion", key: "stretch", label: "Stretch", min: 0, max: 0.4, step: 0.01, format: (v) => Number(v).toFixed(2) },
+                { group: "Optics 光學", key: "bezel", label: "Bezel 邊框", min: 2, max: 42, step: 1, format: (v) => `${v}px` },
+                { group: "Optics 光學", key: "refraction", label: "Refraction 折射", min: 0, max: 2.2, step: 0.01, format: (v) => `${Number(v).toFixed(2)}x` },
+                { group: "Optics 光學", key: "thickness", label: "Thickness 厚度", min: 10, max: 220, step: 1, format: (v) => `${v}px` },
+                { group: "Optics 光學", key: "shrink", label: "Center shrink 中心縮放", min: -0.6, max: 0.6, step: 0.01, format: (v) => `${Math.round(Number(v) * 100)}%` },
+                { group: "Optics 光學", key: "specular", label: "Specular 高光", min: 0, max: 0.6, step: 0.01, format: (v) => Number(v).toFixed(2) },
+                { group: "Optics 光學", key: "blur", label: "Blur 模糊", min: 0, max: 2, step: 0.01, format: (v) => `${Number(v).toFixed(2)}px` },
+                { group: "Optics 光學", key: "saturation", label: "Saturation 飽和度", min: 0.5, max: 3, step: 0.01, format: (v) => `${Number(v).toFixed(2)}x` },
+                { group: "Motion 動態", key: "idleScale", label: "Idle scale 靜止比例", min: 0.45, max: 1.2, step: 0.01, format: (v) => Number(v).toFixed(2) },
+                { group: "Motion 動態", key: "activeScale", label: "Active scale 啟動比例", min: 0.6, max: 2, step: 0.01, format: (v) => Number(v).toFixed(2) },
+                { group: "Motion 動態", key: "stiffness", label: "Stiffness 剛度", min: 120, max: 1400, step: 10, format: (v) => String(v) },
+                { group: "Motion 動態", key: "damping", label: "Damping 阻尼", min: 10, max: 90, step: 1, format: (v) => String(v) },
+                { group: "Motion 動態", key: "stretch", label: "Stretch 拉伸", min: 0, max: 0.4, step: 0.01, format: (v) => Number(v).toFixed(2) },
             ];
 
             const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -1478,8 +1541,8 @@
             function renderControls() {
                 const root = byId("controls");
                 const groups = selectedComponent.endsWith("Container")
-                    ? ["Optics"]
-                    : ["Optics", "Motion"];
+                    ? ["Optics 光學"]
+                    : ["Optics 光學", "Motion 動態"];
                 root.innerHTML = groups.map((group) => {
                     const controls = controlDefinitions.filter((item) => item.group === group);
                     return `
@@ -1522,7 +1585,7 @@
                         output.textContent = definition.type === "select"
                             ? input.selectedOptions[0]?.textContent
                             : definition.format(settings[selectedComponent][key]);
-                        if (definition.group === "Optics") {
+                        if (definition.group.startsWith("Optics")) {
                             scheduleFilterRebuild(selectedComponent);
                             refreshTunerStatus();
                         }
@@ -2385,8 +2448,8 @@
                 }
                 const changed = countChangedFields();
                 status.textContent = changed
-                    ? `${changed} field${changed > 1 ? "s" : ""} changed · save to keep`
-                    : "matching shipped defaults";
+                    ? `${changed} field${changed > 1 ? "s" : ""} changed · save to keep 已變更 ${changed} 項 · 儲存以保留`
+                    : "matching shipped defaults 符合出廠預設";
                 status.classList.toggle("is-dirty", changed > 0);
             }
 
@@ -2399,7 +2462,7 @@
             byId("saveButton").addEventListener("click", () => {
                 const changed = countChangedFields();
                 if (!changed) {
-                    refreshTunerStatus("nothing to save — all values are default");
+                    refreshTunerStatus("nothing to save — all values are default 無需儲存，全部為預設值");
                     setTimeout(() => refreshTunerStatus(), 1600);
                     return;
                 }
@@ -2410,18 +2473,18 @@
                 link.download = "liquid-glass-tuning.json";
                 link.click();
                 URL.revokeObjectURL(url);
-                flash(byId("saveButton"), "Saved");
+                flash(byId("saveButton"), "Saved 已儲存");
             });
 
             byId("copyButton").addEventListener("click", async () => {
                 const json = exportTuning();
                 try {
                     await navigator.clipboard.writeText(json);
-                    flash(byId("copyButton"), "Copied");
+                    flash(byId("copyButton"), "Copied 已複製");
                 } catch (error) {
                     /* Clipboard needs a secure context; file:// has none. */
                     console.log("[Liquid Glass] tuning:\n" + json);
-                    flash(byId("copyButton"), "In console");
+                    flash(byId("copyButton"), "In console 請看主控台");
                 }
             });
 
@@ -2436,7 +2499,7 @@
                     try {
                         parsed = JSON.parse(String(reader.result));
                     } catch (error) {
-                        refreshTunerStatus("could not parse that file as JSON");
+                        refreshTunerStatus("could not parse that file as JSON 無法解析 JSON 檔案");
                         return;
                     }
                     /* Merge onto defaults, not onto current settings: loading a
@@ -2456,7 +2519,7 @@
                     });
                     renderControls();
                     scheduleFilterRebuild();
-                    refreshTunerStatus(`loaded ${applied} field${applied === 1 ? "" : "s"}`);
+                    refreshTunerStatus(`loaded ${applied} field${applied === 1 ? "" : "s"} 已載入 ${applied} 項設定`);
                     setTimeout(() => refreshTunerStatus(), 1600);
                 };
                 reader.readAsText(file);
