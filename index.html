@@ -63,7 +63,7 @@
             /* The tuner carries English + Traditional Chinese labels. Keep
                enough width for both without forcing selects or headings to
                overflow into the gallery. */
-            grid-template-columns: 495px minmax(0, 1fr);
+            grid-template-columns: 742px minmax(0, 1fr);
             min-height: 100vh;
         }
 
@@ -87,13 +87,6 @@
 
         .tuner h1 span {
             display: block;
-        }
-
-        .tuner-copy {
-            margin: 0 0 16px;
-            color: var(--muted);
-            font-size: 24px;
-            line-height: 1.5;
         }
 
         .target-picker {
@@ -129,7 +122,7 @@
 
         .control-group {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 8px;
         }
 
@@ -379,7 +372,7 @@
 
         .tuner-io-row {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 6px;
         }
 
@@ -410,33 +403,6 @@
 
         .tuner-io-status.is-dirty {
             color: var(--green);
-        }
-
-        .settings-preview {
-            margin-top: 10px;
-            border: 1px solid rgb(255 255 255 / 0.08);
-            border-radius: 12px;
-            background: #0f1016;
-        }
-
-        .settings-preview summary {
-            padding: 8px 10px;
-            color: #aaaab4;
-            cursor: pointer;
-            font-size: 20px;
-            font-weight: 850;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-
-        .settings-preview pre {
-            max-height: 220px;
-            margin: 0;
-            overflow: auto;
-            padding: 0 10px 10px;
-            color: #d7d8df;
-            font: 10px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
-            white-space: pre-wrap;
         }
 
         .stage {
@@ -1070,10 +1036,6 @@
                 white-space: normal;
             }
 
-            .tuner-copy {
-                font-size: 12px;
-            }
-
             .target-picker label,
             .group-title {
                 font-size: 10px;
@@ -1111,8 +1073,7 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .tuner-io-status,
-            .settings-preview summary {
+            .tuner-io-status {
                 font-size: 11px;
             }
 
@@ -1177,7 +1138,6 @@
     <div class="app">
         <aside class="tuner">
             <h1><span>Liquid Optics Core</span><span lang="zh-Hant">液態光學核心</span></h1>
-            <p class="tuner-copy">Each component keeps an independent optical kernel and motion preset. 每個元件都有獨立的光學核心與動態預設。</p>
 
             <div class="target-picker">
                 <label for="targetSelect">Target component 目標元件</label>
@@ -1203,15 +1163,8 @@
                 <div class="tuner-io-row">
                     <button class="tuner-io-btn" id="saveButton" type="button">Save 儲存</button>
                     <button class="tuner-io-btn" id="copyButton" type="button">Copy 複製</button>
-                    <button class="tuner-io-btn" id="shareButton" type="button">Share 分享</button>
-                    <button class="tuner-io-btn" id="loadButton" type="button">Load 載入</button>
                 </div>
                 <p class="tuner-io-status" id="tunerStatus">matching shipped defaults 符合出廠預設</p>
-                <details class="settings-preview" open>
-                    <summary>Current settings 目前設定</summary>
-                    <pre id="settingsPreview"></pre>
-                </details>
-                <input id="loadInput" type="file" accept="application/json,.json" hidden>
             </div>
         </aside>
 
@@ -1456,72 +1409,16 @@
                 { group: "Optics 光學", key: "specular", label: "Specular 高光", min: 0, max: 0.6, step: 0.01, format: (v) => Number(v).toFixed(2) },
                 { group: "Optics 光學", key: "blur", label: "Blur 模糊", min: 0, max: 2, step: 0.01, format: (v) => `${Number(v).toFixed(2)}px` },
                 { group: "Optics 光學", key: "saturation", label: "Saturation 飽和度", min: 0.5, max: 3, step: 0.01, format: (v) => `${Number(v).toFixed(2)}x` },
-                { group: "Motion 動態", key: "idleScale", label: "Idle scale 靜止比例", min: 0.45, max: 1.2, step: 0.01, format: (v) => Number(v).toFixed(2) },
-                { group: "Motion 動態", key: "activeScale", label: "Active scale 啟動比例", min: 0.6, max: 2, step: 0.01, format: (v) => Number(v).toFixed(2) },
-                { group: "Motion 動態", key: "stiffness", label: "Stiffness 剛度", min: 120, max: 1400, step: 10, format: (v) => String(v) },
-                { group: "Motion 動態", key: "damping", label: "Damping 阻尼", min: 10, max: 90, step: 1, format: (v) => String(v) },
-                { group: "Motion 動態", key: "stretch", label: "Stretch 拉伸", min: 0, max: 0.4, step: 0.01, format: (v) => Number(v).toFixed(2) },
+                { group: "Motion 動畫", key: "idleScale", label: "Idle scale 靜止比例", min: 0.45, max: 1.2, step: 0.01, format: (v) => Number(v).toFixed(2) },
+                { group: "Motion 動畫", key: "activeScale", label: "Active scale 啟動比例", min: 0.6, max: 2, step: 0.01, format: (v) => Number(v).toFixed(2) },
+                { group: "Motion 動畫", key: "stiffness", label: "Stiffness 剛度", min: 120, max: 1400, step: 10, format: (v) => String(v) },
+                { group: "Motion 動畫", key: "damping", label: "Damping 阻尼", min: 10, max: 90, step: 1, format: (v) => String(v) },
+                { group: "Motion 動畫", key: "stretch", label: "Stretch 拉伸", min: 0, max: 0.4, step: 0.01, format: (v) => Number(v).toFixed(2) },
             ];
 
             const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
             const byId = (id) => document.getElementById(id);
             let selectedComponent = "precision";
-
-            function mergeTuningDiff(target, diff) {
-                let applied = 0;
-                if (!diff || typeof diff !== "object" || Array.isArray(diff)) return applied;
-                Object.entries(diff).forEach(([component, values]) => {
-                    if (!target[component] || !values || typeof values !== "object" || Array.isArray(values)) return;
-                    Object.entries(values).forEach(([key, value]) => {
-                        if (!(key in target[component])) return;
-                        const current = target[component][key];
-                        if (typeof value !== typeof current) return;
-                        if (typeof value === "number" && !Number.isFinite(value)) return;
-                        target[component][key] = value;
-                        applied += 1;
-                    });
-                });
-                return applied;
-            }
-
-            function encodeShareValue(value) {
-                const bytes = new TextEncoder().encode(value);
-                let binary = "";
-                bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
-                return btoa(binary)
-                    .replace(/\+/g, "-")
-                    .replace(/\//g, "_")
-                    .replace(/=+$/, "");
-            }
-
-            function decodeShareValue(value) {
-                const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
-                const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
-                const binary = atob(padded);
-                const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
-                return new TextDecoder().decode(bytes);
-            }
-
-            function readShareState() {
-                const params = new URLSearchParams(location.hash.slice(1));
-                const encoded = params.get("settings");
-                if (!encoded) return null;
-                try {
-                    const diff = JSON.parse(decodeShareValue(encoded));
-                    const component = params.get("component");
-                    return { component, diff };
-                } catch (error) {
-                    return null;
-                }
-            }
-
-            const shareState = readShareState();
-            if (shareState) {
-                mergeTuningDiff(initialSettings, shareState.diff);
-                if (Object.prototype.hasOwnProperty.call(initialSettings, shareState.component)) {
-                    selectedComponent = shareState.component;
-                }
-            }
 
             let settings = null;
             let surfaces = [];
@@ -1603,7 +1500,7 @@
                 const root = byId("controls");
                 const groups = selectedComponent.endsWith("Container")
                     ? ["Optics 光學"]
-                    : ["Optics 光學", "Motion 動態"];
+                    : ["Optics 光學", "Motion 動畫"];
                 root.innerHTML = groups.map((group) => {
                     const controls = controlDefinitions.filter((item) => item.group === group);
                     return `
@@ -1650,10 +1547,8 @@
                             scheduleFilterRebuild(selectedComponent);
                             refreshTunerStatus();
                         }
-                        refreshSettingsPreview();
                     });
                 });
-                refreshSettingsPreview();
             }
 
             function initPrecisionLens() {
@@ -2484,15 +2379,6 @@
                 return JSON.stringify(out, null, 4);
             }
 
-            function refreshSettingsPreview() {
-                const preview = byId("settingsPreview");
-                if (!preview || !settings || !settings[selectedComponent]) return;
-                preview.textContent = JSON.stringify({
-                    component: selectedComponent,
-                    settings: settings[selectedComponent],
-                }, null, 2);
-            }
-
             function countChangedFields() {
                 return Object.entries(settings).reduce((total, [component, values]) => {
                     const base = defaults[component] || {};
@@ -2549,68 +2435,8 @@
                 }
             });
 
-            byId("shareButton").addEventListener("click", async () => {
-                const url = new URL(window.location.href);
-                url.searchParams.delete("v");
-                const params = new URLSearchParams();
-                params.set("settings", encodeShareValue(exportTuning()));
-                params.set("component", selectedComponent);
-                url.hash = params.toString();
-                history.replaceState(null, "", url);
-                try {
-                    await navigator.clipboard.writeText(url.toString());
-                    flash(byId("shareButton"), "Link copied 已複製");
-                    refreshTunerStatus("share link copied 已複製分享連結");
-                } catch (error) {
-                    window.prompt("Copy this share link", url.toString());
-                    flash(byId("shareButton"), "Copy link 複製連結");
-                }
-            });
-
-            byId("loadButton").addEventListener("click", () => byId("loadInput").click());
-
-            byId("loadInput").addEventListener("change", (event) => {
-                const file = event.target.files && event.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = () => {
-                    let parsed;
-                    try {
-                        parsed = JSON.parse(String(reader.result));
-                    } catch (error) {
-                        refreshTunerStatus("could not parse that file as JSON 無法解析 JSON 檔案");
-                        return;
-                    }
-                    /* Merge onto defaults, not onto current settings: loading a
-                       file should reproduce exactly what was saved, not stack on
-                       top of whatever is in the panel right now. */
-                    let applied = 0;
-                    Object.keys(defaults).forEach((component) => {
-                        settings[component] = { ...defaults[component] };
-                    });
-                    Object.entries(parsed).forEach(([component, values]) => {
-                        if (!settings[component] || !values || typeof values !== "object") return;
-                        Object.entries(values).forEach(([key, value]) => {
-                            if (!(key in settings[component])) return;
-                            settings[component][key] = value;
-                            applied += 1;
-                        });
-                    });
-                    renderControls();
-                    scheduleFilterRebuild();
-                    refreshTunerStatus(`loaded ${applied} field${applied === 1 ? "" : "s"} 已載入 ${applied} 項設定`);
-                    setTimeout(() => refreshTunerStatus(), 1600);
-                };
-                reader.readAsText(file);
-                event.target.value = "";
-            });
-
             buildTuner();
             initInteractions();
-            if (shareState) {
-                refreshTunerStatus("shared settings loaded 已載入分享設定");
-                setTimeout(() => refreshTunerStatus(), 1600);
-            }
         })();
     </script>
 </body>

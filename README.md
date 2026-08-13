@@ -13,9 +13,8 @@ Apple開發者手冊建議只在必要元件使用Liquid Glass。
 
 - `01–09` 九個公開元件：Precision Lens、Fluid Slider、Tactile Switch、Drag Dock、Segment Control、Fluid Input、Squish Volume、Layered FAB、Magnetic Stepper。
 - 光學參數：bezel、refraction、thickness、shrink、specular、blur、saturation。
-- 動態參數：idle scale、active scale、stiffness、damping、stretch。
-- `Save / Copy / Load / Share` 與 Current settings 預覽，方便把目前調好的數值帶到自己的元件。
-- `Share` 會把目前元件與調參差異放進網址 hash；別人打開分享連結就會載入同一組設定，不需要 server。
+- 動畫參數：idle scale、active scale、stiffness、damping、stretch。
+- `Save / Copy` 可以匯出或複製目前調好的數值，方便帶到自己的元件。
 
 ## Usage
 
