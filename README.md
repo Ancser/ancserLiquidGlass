@@ -77,22 +77,4 @@ Apple開發者手冊建議只在必要元件使用Liquid Glass。
 - [`skills/liquid-glass/assets/glass-core.js`](skills/liquid-glass/assets/glass-core.js) — 唯一引擎程式碼。
 - [`skills/liquid-glass/assets/glass-core.css`](skills/liquid-glass/assets/glass-core.css) — 引擎結構 CSS。
 
-## GitHub Pages
 
-在 repository 的 **Settings → Pages** 選擇 **Deploy from a branch**，
-branch 選 `main`、folder 選 `/ (root)`。根目錄的 `index.html` 會直接成為網站入口。
-
-## 本機預覽
-
-```bash
-python -m http.server 8777 --bind 127.0.0.1
-```
-
-然後開啟 <http://127.0.0.1:8777/>。
-
-## Verification
-
-```bash
-node --check skills/liquid-glass/assets/glass-core.js
-pytest -q
-```
