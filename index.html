@@ -3,7 +3,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Liquid Optics Component Lab</title>
+    <title>Liquid Optics Core</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="skills/liquid-glass/assets/glass-core.css">
     <style>
         :root {
@@ -18,6 +21,9 @@
             --blue: #5ac8fa;
             --pink: #ff375f;
             --spring: cubic-bezier(.2, .82, .22, 1.08);
+            --font-art:
+                "Dosis", "Noto Sans TC", "Noto Sans CJK TC",
+                "Microsoft JhengHei", "PingFang TC", Arial, sans-serif;
 
             /* Surface treatment for every lens. Hoisted into tokens so the
                dock, FAB, slider thumb and switch thumb cannot drift apart. */
@@ -43,15 +49,17 @@
 
         body {
             color: var(--text);
-            font-family:
-                ui-rounded, "SF Pro Rounded", "SF Pro Display",
-                Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: var(--font-art);
+            font-weight: 300;
+            font-synthesis: none;
+            font-optical-sizing: auto;
         }
 
         button,
         input,
         select {
             font: inherit;
+            font-weight: inherit;
         }
 
         button {
@@ -72,7 +80,7 @@
             top: 0;
             height: 100vh;
             overflow: auto;
-            padding: 30px 28px 36px;
+            padding: 42px 40px 52px;
             border-right: 1px solid var(--line);
             background: #08090d;
         }
@@ -81,7 +89,7 @@
             margin: 0 0 6px;
             font-size: 48px;
             line-height: 1.05;
-            letter-spacing: -0.08em;
+            letter-spacing: -0.035em;
             white-space: normal;
         }
 
@@ -99,8 +107,8 @@
         .group-title {
             color: #a9aab3;
             font-size: 20px;
-            font-weight: 850;
-            letter-spacing: 0.12em;
+            font-weight: 300;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
         }
 
@@ -108,11 +116,11 @@
             width: 100%;
             border: 1px solid rgb(255 255 255 / 0.13);
             border-radius: 14px;
-            padding: 10px 12px;
+            padding: 7px 8px;
             color: #fff;
             background: #111218;
             outline: none;
-            font-size: 32px;
+            font-size: 22px;
         }
 
         .control-groups {
@@ -151,23 +159,41 @@
             margin-bottom: 7px;
             color: #aaaab4;
             font-size: 18px;
-            font-weight: 850;
-            letter-spacing: 0.07em;
+            font-weight: 300;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
         }
 
         .control output {
             color: #fff;
             font-size: 20px;
+            font-weight: 300;
             letter-spacing: 0;
             text-transform: none;
             white-space: nowrap;
         }
 
-        .control input[type="range"] {
+        .tuner-fluid-slider {
+            position: relative;
             width: 100%;
-            margin: 0;
-            accent-color: var(--green);
+            height: 42px;
+            margin-top: 2px;
+            cursor: ew-resize;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .tuner-fluid-slider .slider-track {
+            top: 50%;
+            height: 14px;
+        }
+
+        .tuner-fluid-slider .slider-thumb {
+            top: 5px;
+            width: 54px;
+            height: 32px;
         }
 
         .control select {
@@ -196,8 +222,8 @@
             margin-bottom: 8px;
             color: #aaaab4;
             font-size: 20px;
-            font-weight: 850;
-            letter-spacing: 0.08em;
+            font-weight: 300;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
         }
 
@@ -320,8 +346,8 @@
             color: #9899a4;
             background: #202127;
             font-size: 14px;
-            font-weight: 850;
-            letter-spacing: 0.08em;
+            font-weight: 300;
+            letter-spacing: 0.12em;
         }
 
         .exhibit h2 {
@@ -330,7 +356,8 @@
                the two names are parallel, not a title and a subtitle. */
             font-size: clamp(22px, 2.15vw, 31px);
             line-height: 1;
-            letter-spacing: -0.055em;
+            font-weight: 300;
+            letter-spacing: -0.025em;
         }
 
         /* Both names are the component's name, so neither is a subtitle:
@@ -351,6 +378,7 @@
             /* zh-Hant glyphs read large at a shared size; -0.04em keeps the
                optical weight of the two scripts matched. */
             font-size: 0.96em;
+            font-weight: 300;
             letter-spacing: -0.01em;
         }
 
@@ -384,8 +412,8 @@
             background: var(--panel);
             font: inherit;
             font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 0.04em;
+            font-weight: 300;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
             cursor: pointer;
         }
@@ -633,6 +661,12 @@
                 var(--glass-relief);
         }
 
+        .tuner-fluid-slider.interacting .slider-thumb {
+            border-color: var(--glass-rim);
+            background: var(--glass-tint);
+            box-shadow: var(--glass-relief);
+        }
+
         .switch-track {
             --switch-progress: 1;
             --switch-track-color: rgb(48 209 88);
@@ -738,7 +772,7 @@
             border: 0;
             background: transparent;
             cursor: pointer;
-            font-weight: 800;
+            font-weight: 300;
         }
 
         .control-source-content {
@@ -877,7 +911,7 @@
             color: #fff;
             background: transparent;
             font-size: 18px;
-            font-weight: 750;
+            font-weight: 300;
         }
 
         .fluid-input-shell input::placeholder {
@@ -1018,7 +1052,17 @@
             z-index: 3;
             text-align: center;
             font-size: 28px;
-            font-weight: 900;
+            font-weight: 300;
+        }
+
+        /* One delicate display type system across the tuner, gallery,
+           controls, values and component labels. The Latin and Traditional
+           Chinese faces are paired so the bilingual UI keeps one art direction. */
+        *,
+        *::before,
+        *::after {
+            font-family: var(--font-art);
+            font-weight: 300;
         }
 
         @media (max-width: 1050px) {
@@ -1027,7 +1071,7 @@
             }
 
             .tuner {
-                padding: 22px 18px;
+                padding: 28px 24px 36px;
             }
 
             .tuner h1 {
@@ -1042,7 +1086,7 @@
             }
 
             .target-picker select {
-                font-size: 16px;
+                font-size: 11px;
             }
 
             .control-row {
@@ -1103,6 +1147,7 @@
             .tuner {
                 position: relative;
                 height: auto;
+                padding: 28px 24px 34px;
                 border-right: 0;
                 border-bottom: 1px solid var(--line);
             }
@@ -1136,7 +1181,7 @@
     </svg>
 
     <div class="app">
-        <aside class="tuner">
+        <aside class="tuner" data-stage="tuner">
             <h1><span>Liquid Optics Core</span><span lang="zh-Hant">液態光學核心</span></h1>
 
             <div class="target-picker">
@@ -1179,7 +1224,7 @@
                     <div class="precision-world">
                         <div class="precision-copy">
                             <span class="kicker">Kikuchi Momoko</span>
-                            <h3>Tropic of<br>Capricorn</h3>
+                            <h3>TROPIC OF<br>CAPRICORN</h3>
                             <p>Drag the capsule across the sleeve.</p>
                         </div>
                         <div class="precision-image">
@@ -1360,13 +1405,13 @@
                    pinned at 0 stays full-size no matter how far the PILL's
                    shrink is pushed, which is what made the selector read as a
                    shrunk pill on an unshrunk shell. The selector is
-                   intentionally more shrunken than its shell (dock/segment
-                   0.20, container 0.00/0.02), so a thick edge does not turn
+                   intentionally more shrunken than its shell (dock 0.08,
+                   segment 0.20, container 0.00/0.02), so a thick edge does not turn
                    into a block of sampled pixels. */
                 precision: { profile: "convex-squircle", bezel: 23, refraction: 1.11, thickness: 106, shrink: -0.20, filterScale: 1.50, specular: 0.60, blur: 0.00, saturation: 1.05, idleScale: 1.20, activeScale: 2.00, stiffness: 120, damping: 10, stretch: 0.00 },
                 slider: { profile: "convex-squircle", bezel: 16, refraction: 0.85, thickness: 80, shrink: 0.00, specular: 0.60, blur: 0.10, saturation: 1.25, idleScale: 1.00, activeScale: 1.08, stiffness: 900, damping: 54, stretch: 0.17 },
                 switch: { profile: "convex-squircle", bezel: 19, refraction: 1.00, thickness: 47, shrink: 0.26, specular: 0.60, blur: 0.18, saturation: 1.25, idleScale: 1.00, activeScale: 1.50, stiffness: 820, damping: 48, stretch: 0.12 },
-                dock: { profile: "convex-squircle", bezel: 18, refraction: 0.23, thickness: 70, shrink: 0.20, specular: 0.60, blur: 0.00, saturation: 1.22, idleScale: 1.00, activeScale: 1.50, stiffness: 520, damping: 34, stretch: 0.16 },
+                dock: { profile: "convex-squircle", bezel: 2, refraction: 1.45, thickness: 70, shrink: 0.08, specular: 0.00, blur: 0.00, saturation: 1.22, idleScale: 1.00, activeScale: 1.50, stiffness: 510, damping: 45, stretch: 0.00 },
                 dockContainer: { profile: "convex-squircle", bezel: 18, refraction: 0.92, thickness: 70, shrink: 0.00, specular: 0.60, blur: 0.20, saturation: 1.22, idleScale: 1.00, activeScale: 1.00, stiffness: 520, damping: 34, stretch: 0.00 },
                 segment: { profile: "convex-squircle", bezel: 18, refraction: 0.88, thickness: 40, shrink: 0.20, specular: 0.60, blur: 0.18, saturation: 1.25, idleScale: 1.00, activeScale: 1.62, stiffness: 760, damping: 42, stretch: 0.14 },
                 segmentContainer: { profile: "convex-squircle", bezel: 18, refraction: 0.88, thickness: 68, shrink: 0.02, specular: 0.60, blur: 0.18, saturation: 1.25, idleScale: 1.00, activeScale: 1.00, stiffness: 760, damping: 42, stretch: 0.00 },
@@ -1420,13 +1465,99 @@
             const byId = (id) => document.getElementById(id);
             let selectedComponent = "precision";
 
-            let settings = null;
+            /* Build the tuner before LiquidGlass.mount() so its optical slider
+               surfaces are discovered together with the gallery surfaces. */
+            let settings = initialSettings;
             let surfaces = [];
+            const tunerSliderMounts = new Map();
+
+            /* One geometry contract for both the live slider and its sampled
+               clone. The fill ends at the layout centre of the thumb, so a
+               transform used for tactile feedback cannot move the visual
+               centre of the track fill. */
+            function fluidSliderGeometry(root) {
+                const track = root?.querySelector(".slider-track");
+                const thumb = root?.querySelector(".slider-thumb");
+                if (!track || !thumb) return null;
+                const trackWidth = track.clientWidth;
+                const thumbWidth = thumb.offsetWidth;
+                return {
+                    trackLeft: track.offsetLeft,
+                    trackWidth,
+                    thumbWidth,
+                    travel: Math.max(0, trackWidth - thumbWidth),
+                };
+            }
+
+            function fluidSliderFillWidth(progress, geometry) {
+                if (progress <= 0.0005) return 0;
+                if (progress >= 0.9995) return geometry.trackWidth;
+                return progress * geometry.travel + geometry.thumbWidth / 2;
+            }
+
+            /* Keep one source slider and its optical stage copy in lockstep.
+               The glass engine owns the copy, but the copy's live control
+               geometry is still page state, so update both through this
+               shared contract after every source render. */
+            function syncFluidSliderCopy(sourceSlider, stageCopy) {
+                const sourceThumb = sourceSlider?.querySelector(".slider-thumb");
+                const sourceGeometry = fluidSliderGeometry(sourceSlider);
+                if (!sourceThumb || !sourceGeometry || !stageCopy) return;
+                const sampleSlider = sourceSlider.classList.contains("tuner-fluid-slider")
+                    ? stageCopy.querySelector(
+                        '.tuner-fluid-slider[data-setting="' + sourceSlider.dataset.setting + '"]'
+                    )
+                    : stageCopy.querySelector(".fluid-slider");
+                const sampleThumb = sampleSlider?.querySelector(".slider-thumb");
+                const sampleFill = sampleSlider?.querySelector(".slider-fill");
+                const sampleGeometry = fluidSliderGeometry(sampleSlider);
+                if (!sampleSlider || !sampleThumb || !sampleFill || !sampleGeometry) return;
+
+                const sourceLeft = Number.parseFloat(sourceThumb.style.left) || 0;
+                const progress = clamp(
+                    (sourceLeft - sourceGeometry.trackLeft)
+                        / Math.max(1, sourceGeometry.travel),
+                    0,
+                    1
+                );
+                sampleThumb.style.left =
+                    (sampleGeometry.trackLeft + progress * sampleGeometry.travel) + "px";
+                sampleThumb.style.transform = sourceThumb.style.transform;
+                sampleFill.style.width =
+                    fluidSliderFillWidth(progress, sampleGeometry) + "px";
+                sampleSlider.classList.toggle(
+                    "interacting",
+                    sourceSlider.classList.contains("interacting")
+                );
+                sampleSlider.classList.toggle(
+                    "endpoint-transition",
+                    sourceSlider.classList.contains("endpoint-transition")
+                );
+                sampleSlider.setAttribute(
+                    "aria-valuenow",
+                    sourceSlider.getAttribute("aria-valuenow") || ""
+                );
+
+                const setting = sourceSlider.dataset.setting;
+                if (setting) {
+                    const outputSelector = '[data-output="' + setting + '"]';
+                    const sourceOutput = sourceSlider
+                        .closest(".control")
+                        ?.querySelector(outputSelector);
+                    const sampleOutput = sampleSlider
+                        .closest(".control")
+                        ?.querySelector(outputSelector);
+                    if (sourceOutput && sampleOutput) {
+                        sampleOutput.textContent = sourceOutput.textContent;
+                    }
+                }
+            }
+
             function syncDynamicSample(surface) {
                 if (surface.component === "slider") {
-                    const source = byId("sliderFill");
-                    const sample = surface.stageCopy.querySelector(".slider-fill");
-                    if (source && sample) sample.style.width = source.style.width;
+                    const tuner = surface.element.closest(".tuner-fluid-slider");
+                    const sourceSlider = tuner || byId("fluidSlider");
+                    syncFluidSliderCopy(sourceSlider, surface.stageCopy);
                     return;
                 }
                 if (surface.component === "switch") {
@@ -1465,6 +1596,7 @@
                 byId("specularPreview").src = surface.lastSpecular;
                 byId("kernelSize").textContent = surface.kernelSize;
             }
+            buildTuner();
             const glass = LiquidGlass.mount({
                 root: document,
                 filterDefs: document.querySelector("[data-glass-defs] defs"),
@@ -1475,7 +1607,8 @@
             settings = glass.settings;
             surfaces = glass.surfaces;
             const { Spring, runSpringLoop, fastReturn, cutOriginalContentUnderLens } = LiquidGlass;
-            const syncOpticalSurfaces = (component = null) => glass.sync(component);
+            const syncOpticalSurfaces = (component = null, element = null) =>
+                glass.sync(component, element);
             const scheduleFilterRebuild = (component = null) => glass.rebuild(component);
             updateKernelPreview();
 
@@ -1496,59 +1629,289 @@
                 renderControls();
             }
 
+            function mountFluidSlider(root, options = {}) {
+                const thumb = root.querySelector(".slider-thumb");
+                const track = root.querySelector(".slider-track");
+                const fill = root.querySelector(".slider-fill");
+                if (!thumb || !track || !fill) return { refresh: () => {} };
+                const min = Number(options.min ?? 0);
+                const max = Number(options.max ?? 1);
+                const step = Number(options.step ?? 0.01);
+                let value = Number(options.getValue?.() ?? options.value ?? 0.42);
+                let dragging = false;
+                let pointerId = null;
+                let lastPointerX = 0;
+                let lastTime = 0;
+                let velocity = 0;
+                let activity = 0;
+                let activityTarget = 0;
+                let scaleX = 1;
+                let scaleY = 1;
+                let animationFrame = 0;
+
+                const readValue = () => clamp(
+                    Number(options.getValue?.() ?? value), min, max
+                );
+                const snap = (next) => clamp(
+                    Math.round(next / step) * step, min, max
+                );
+                /* Keep every horizontal measurement in the track's own
+                   coordinate system. The old root.clientWidth calculation
+                   happened to work for the gallery slider, but drifted when
+                   a tuner card, border, padding, or fractional width made
+                   the track and root differ by even one pixel. */
+                const geometry = () => fluidSliderGeometry(root);
+                const schedule = () => {
+                    if (!animationFrame) animationFrame = requestAnimationFrame(animate);
+                };
+                const sync = () => {
+                    options.onSync?.(thumb);
+                    syncFluidSliderCopy(root, thumb.querySelector(".optical-stage-copy"));
+                };
+                const render = () => {
+                    value = readValue();
+                    const progress = clamp(
+                        (value - min) / Math.max(0.0001, max - min),
+                        0,
+                        1
+                    );
+                    const { trackLeft, trackWidth, thumbWidth, travel } = geometry();
+                    const thumbX = trackLeft + progress * travel;
+                    const atStart = progress <= 0.0005;
+                    const atEnd = progress >= 0.9995;
+                    const fillWidth = fluidSliderFillWidth(progress, {
+                        trackWidth,
+                        thumbWidth,
+                        travel,
+                    });
+                    const config = options.getConfig?.() || {};
+                    const idleScale = Number(options.idleScale ?? config.idleScale ?? 1);
+                    const activeScale = Number(
+                        options.activeScale ?? config.activeScale ?? idleScale
+                    );
+                    const stretchLimit = Number(
+                        options.stretch ?? config.stretch ?? 0.18
+                    );
+                    const stretch = Math.min(stretchLimit, Math.abs(velocity) / 5000);
+                    const targetScaleX = (dragging ? activeScale : idleScale) + stretch;
+                    const targetScaleY = (dragging ? activeScale : idleScale) - stretch * 0.35;
+                    activity += (activityTarget - activity) * 0.28;
+                    scaleX += (targetScaleX - scaleX) * 0.28;
+                    scaleY += (targetScaleY - scaleY) * 0.28;
+                    root.classList.toggle("endpoint-transition", atStart || atEnd);
+                    root.classList.toggle("interacting", dragging || activity > 0.01);
+                    root.style.setProperty("--slider-glass", activity.toFixed(4));
+                    fill.style.width = `${fillWidth}px`;
+                    thumb.style.left = `${thumbX}px`;
+                    thumb.style.transform = `scale(${scaleX}, ${scaleY})`;
+                    root.setAttribute("aria-valuemin", String(min));
+                    root.setAttribute("aria-valuemax", String(max));
+                    root.setAttribute("aria-valuenow", String(value));
+                    options.onRender?.(value, progress);
+                    return dragging
+                        || Math.abs(activityTarget - activity) > 0.01
+                        || activity > 0.01
+                        || Math.abs(targetScaleX - scaleX) > 0.01
+                        || Math.abs(targetScaleY - scaleY) > 0.01;
+                };
+                const animate = () => {
+                    animationFrame = 0;
+                    const settling = render();
+                    /* render() also advances the thumb's transform spring.
+                       Keep the sampled clone on that same frame: syncing only
+                       on pointermove leaves the optical world at the previous
+                       scale while the small tuner thumb is returning to idle,
+                       which is the visible 1px jump / off-centre sample. */
+                    sync();
+                    velocity *= 0.82;
+                    if (settling || Math.abs(velocity) > 0.5) schedule();
+                };
+                const updateFromPointer = (clientX) => {
+                    const rect = root.getBoundingClientRect();
+                    const { trackLeft, thumbWidth, travel } = geometry();
+                    const now = performance.now();
+                    const dt = Math.max(1, now - lastTime) / 1000;
+                    velocity = lastTime ? (clientX - lastPointerX) / dt : 0;
+                    const progress = clamp(
+                        (clientX - rect.left - trackLeft - thumbWidth / 2)
+                            / Math.max(1, travel),
+                        0,
+                        1
+                    );
+                    value = snap(min + progress * (max - min));
+                    options.setValue?.(value);
+                    options.onValueChange?.(value);
+                    lastPointerX = clientX;
+                    lastTime = now;
+                    render();
+                    /* The source fill and thumb must be in their final
+                       positions before the glass engine samples the clone.
+                       Syncing before render leaves the optical layer one
+                       pointer frame behind the live control. */
+                    sync();
+                    schedule();
+                };
+                const begin = (event) => {
+                    if (event.pointerType === "mouse" && event.button !== 0) return;
+                    event.preventDefault();
+                    if (pointerId !== null && pointerId !== event.pointerId) return;
+                    dragging = true;
+                    pointerId = event.pointerId;
+                    activityTarget = 1;
+                    lastPointerX = event.clientX;
+                    lastTime = performance.now();
+                    root.setPointerCapture?.(event.pointerId);
+                    updateFromPointer(event.clientX);
+                };
+                const move = (event) => {
+                    if (!dragging || event.pointerId !== pointerId) return;
+                    event.preventDefault();
+                    updateFromPointer(event.clientX);
+                };
+                const end = (event) => {
+                    if (pointerId === null || event.pointerId !== pointerId) return;
+                    const endingPointerId = pointerId;
+                    dragging = false;
+                    pointerId = null;
+                    activityTarget = 0;
+                    velocity = 0;
+                    if (event.type !== "lostpointercapture" && root.hasPointerCapture?.(endingPointerId)) {
+                        root.releasePointerCapture(endingPointerId);
+                    }
+                    schedule();
+                };
+                const keydown = (event) => {
+                    const direction = event.key === "ArrowRight" || event.key === "ArrowUp" ? 1
+                        : event.key === "ArrowLeft" || event.key === "ArrowDown" ? -1 : 0;
+                    if (!direction) return;
+                    event.preventDefault();
+                    value = snap(readValue() + direction * step);
+                    options.setValue?.(value);
+                    options.onValueChange?.(value);
+                    activityTarget = 1;
+                    render();
+                    sync();
+                    schedule();
+                    clearTimeout(root._keyboardTimer);
+                    root._keyboardTimer = setTimeout(() => {
+                        activityTarget = 0;
+                        schedule();
+                    }, 140);
+                };
+                root.addEventListener("pointerdown", begin);
+                root.addEventListener("pointermove", move);
+                root.addEventListener("pointerup", end);
+                root.addEventListener("pointercancel", end);
+                root.addEventListener("lostpointercapture", end);
+                root.addEventListener("keydown", keydown);
+                root.addEventListener("dragstart", (event) => event.preventDefault());
+                if (typeof ResizeObserver !== "undefined") {
+                    new ResizeObserver(() => {
+                        render();
+                        sync();
+                    }).observe(root);
+                }
+                const refresh = () => {
+                    value = readValue();
+                    render();
+                    /* Target selection changes all tuner values at once. Once
+                       the engine is mounted, refresh that one source surface
+                       immediately; the pre-mount build pass intentionally
+                       skips this because the sync callback is not live yet. */
+                    if (surfaces.length) sync();
+                };
+                refresh();
+                return { refresh };
+            }
+
             function renderControls() {
                 const root = byId("controls");
-                const groups = selectedComponent.endsWith("Container")
-                    ? ["Optics 光學"]
-                    : ["Optics 光學", "Motion 動畫"];
-                root.innerHTML = groups.map((group) => {
-                    const controls = controlDefinitions.filter((item) => item.group === group);
-                    return `
-                        <section class="control-group">
-                            <div class="group-title">${group}</div>
-                            ${controls.map((definition) => {
-                                const output = `<output data-output="${definition.key}"></output>`;
-                                if (definition.type === "select") {
+                if (root.dataset.built !== "true") {
+                    root.innerHTML = ["Optics", "Motion"].map((prefix) => {
+                        const groupKey = prefix.toLowerCase();
+                        const groupLabel = controlDefinitions.find((item) => (
+                            item.group.startsWith(prefix)
+                        )).group;
+                        const controls = controlDefinitions.filter((item) => (
+                            item.group.startsWith(prefix)
+                        ));
+                        return `
+                            <section class="control-group" data-control-group="${groupKey}">
+                                <div class="group-title">${groupLabel}</div>
+                                ${controls.map((definition) => {
+                                    const output = `<output data-output="${definition.key}"></output>`;
+                                    if (definition.type === "select") {
+                                        return `
+                                            <div class="control wide" data-control="${definition.key}">
+                                                <div class="control-row"><span>${definition.label}</span>${output}</div>
+                                                <select data-setting="${definition.key}">
+                                                    ${definition.options.map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}
+                                                </select>
+                                            </div>
+                                        `;
+                                    }
                                     return `
-                                        <div class="control wide">
+                                        <div class="control" data-control="${definition.key}">
                                             <div class="control-row"><span>${definition.label}</span>${output}</div>
-                                            <select data-setting="${definition.key}">
-                                                ${definition.options.map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}
-                                            </select>
+                                            <div class="tuner-fluid-slider" data-setting="${definition.key}" data-min="${definition.min}" data-max="${definition.max}" data-step="${definition.step}" tabindex="0" role="slider" aria-label="${definition.label}">
+                                                <div class="slider-track"><div class="slider-fill"></div></div>
+                                                <div class="optical-surface slider-thumb" data-optical="slider" aria-hidden="true"></div>
+                                            </div>
                                         </div>
                                     `;
-                                }
-                                return `
-                                    <div class="control">
-                                        <div class="control-row"><span>${definition.label}</span>${output}</div>
-                                        <input type="range" data-setting="${definition.key}" min="${definition.min}" max="${definition.max}" step="${definition.step}">
-                                    </div>
-                                `;
-                            }).join("")}
-                        </section>
-                    `;
-                }).join("");
+                                }).join("")}
+                            </section>
+                        `;
+                    }).join("");
+                    root.dataset.built = "true";
 
-                root.querySelectorAll("[data-setting]").forEach((input) => {
-                    const key = input.dataset.setting;
-                    const definition = controlDefinitions.find((item) => item.key === key);
-                    input.value = settings[selectedComponent][key];
-                    const output = root.querySelector(`[data-output="${key}"]`);
-                    output.textContent = definition.type === "select"
-                        ? input.selectedOptions[0]?.textContent
-                        : definition.format(settings[selectedComponent][key]);
-                    input.addEventListener("input", () => {
-                        settings[selectedComponent][key] =
-                            definition.type === "select" ? input.value : Number(input.value);
-                        output.textContent = definition.type === "select"
-                            ? input.selectedOptions[0]?.textContent
-                            : definition.format(settings[selectedComponent][key]);
-                        if (definition.group.startsWith("Optics")) {
+                    root.querySelectorAll(".tuner-fluid-slider").forEach((slider) => {
+                        const key = slider.dataset.setting;
+                        const definition = controlDefinitions.find((item) => item.key === key);
+                        const output = root.querySelector(`[data-output="${key}"]`);
+                        tunerSliderMounts.set(key, mountFluidSlider(slider, {
+                            getValue: () => Number(settings[selectedComponent][key]),
+                            setValue: (next) => { settings[selectedComponent][key] = next; },
+                            min: Number(slider.dataset.min),
+                            max: Number(slider.dataset.max),
+                            step: Number(slider.dataset.step),
+                            getConfig: () => settings.slider,
+                            onValueChange: () => {
+                                if (definition.group.startsWith("Optics")) {
+                                    scheduleFilterRebuild(selectedComponent);
+                                }
+                                refreshTunerStatus();
+                            },
+                            /* A tuner interaction changes the selected source
+                               row and its sampled stage in the same frame.
+                               Sync the small slider set together so a stale
+                               element reference cannot leave only the row
+                               being dragged one frame behind its clone. */
+                            onSync: () => syncOpticalSurfaces("slider"),
+                            onRender: (next) => { output.textContent = definition.format(next); },
+                        }));
+                    });
+                    root.querySelectorAll("select[data-setting]").forEach((input) => {
+                        const key = input.dataset.setting;
+                        input.addEventListener("input", () => {
+                            settings[selectedComponent][key] = input.value;
+                            root.querySelector(`[data-output="${key}"]`).textContent =
+                                input.selectedOptions[0]?.textContent;
                             scheduleFilterRebuild(selectedComponent);
                             refreshTunerStatus();
-                        }
+                        });
                     });
+                }
+
+                root.querySelector('[data-control-group="motion"]').hidden =
+                    selectedComponent.endsWith("Container");
+                root.querySelectorAll("select[data-setting]").forEach((input) => {
+                    const key = input.dataset.setting;
+                    input.value = settings[selectedComponent][key];
+                    root.querySelector(`[data-output="${key}"]`).textContent =
+                        input.selectedOptions[0]?.textContent;
                 });
+                tunerSliderMounts.forEach((mount) => mount.refresh());
             }
 
             function initPrecisionLens() {
@@ -1637,116 +2000,16 @@
 
             function initFluidSlider() {
                 const root = byId("fluidSlider");
-                const thumb = byId("sliderThumb");
-                const fill = byId("sliderFill");
-                const scale = new Spring(settings.slider.idleScale);
-                const stretchX = new Spring(1);
-                const stretchY = new Spring(1);
-                const activity = new Spring(0);
-                let dragging = false;
-                let pointerId = null;
                 let value = 0.42;
-                let thumbX = 0;
-                let lastPointerX = 0;
-                let lastTime = 0;
-
-                const travel = () => root.clientWidth - thumb.offsetWidth;
-                const apply = () => {
-                    const center = thumbX + thumb.offsetWidth / 2;
-                    const edgeEpsilon = 0.5;
-                    const atStart = thumbX <= edgeEpsilon;
-                    const atEnd = thumbX >= travel() - edgeEpsilon;
-                    const fillWidth = atStart
-                        ? 0
-                        : atEnd
-                            ? root.clientWidth
-                            : center;
-                    root.classList.toggle("endpoint-transition", atStart || atEnd);
-                    activity.target = dragging ? 1 : 0;
-                    root.classList.toggle("interacting", dragging);
-                    root.style.setProperty(
-                        "--slider-glass",
-                        clamp(activity.value, 0, 1).toFixed(4)
-                    );
-                    fill.style.width = `${fillWidth}px`;
-                    thumb.style.left = `${thumbX}px`;
-                    thumb.style.transform =
-                        `scale(${scale.value * stretchX.value}, ${scale.value * stretchY.value})`;
-                };
-                const start = () => runSpringLoop(
-                    "slider",
-                    [scale, stretchX, stretchY, activity],
-                    apply,
-                    () => dragging || [scale, stretchX, stretchY, activity]
-                        .some((spring) => !spring.settled())
-                );
-                const update = (clientX) => {
-                    const rect = root.getBoundingClientRect();
-                    const now = performance.now();
-                    const dt = Math.max(1, now - lastTime) / 1000;
-                    const velocity = lastTime ? (clientX - lastPointerX) / dt : 0;
-                    value = clamp(
-                        (clientX - rect.left - thumb.offsetWidth / 2) / Math.max(1, travel()),
-                        0,
-                        1
-                    );
-                    thumbX = value * travel();
-                    const amount = Math.min(settings.slider.stretch, Math.abs(velocity) / 5000);
-                    stretchX.target = 1 + amount;
-                    stretchY.target = 1 - amount * 0.45;
-                    lastPointerX = clientX;
-                    lastTime = now;
-                    apply();
-                    syncOpticalSurfaces("slider");
-                };
-                root.addEventListener("pointerdown", (event) => {
-                    if (event.pointerType === "mouse" && event.button !== 0) return;
-                    event.preventDefault();
-                    if (pointerId !== null && pointerId !== event.pointerId) return;
-                    dragging = true;
-                    pointerId = event.pointerId;
-                    lastPointerX = event.clientX;
-                    lastTime = performance.now();
-                    root.setPointerCapture?.(event.pointerId);
-                    activity.value = Math.max(activity.value, 0.18);
-                    activity.target = 1;
-                    scale.target = settings.slider.activeScale;
-                    update(event.clientX);
-                    start();
+                mountFluidSlider(root, {
+                    getValue: () => value,
+                    setValue: (next) => { value = next; },
+                    min: 0,
+                    max: 1,
+                    step: 0.01,
+                    getConfig: () => settings.slider,
+                    onSync: () => syncOpticalSurfaces("slider"),
                 });
-                root.addEventListener("pointermove", (event) => {
-                    if (!dragging || event.pointerId !== pointerId) return;
-                    event.preventDefault();
-                    update(event.clientX);
-                });
-                const release = (event) => {
-                    if (pointerId === null || event.pointerId !== pointerId) return;
-                    const endingPointerId = pointerId;
-                    dragging = false;
-                    pointerId = null;
-                    if (
-                        event.type !== "lostpointercapture"
-                        && root.hasPointerCapture?.(endingPointerId)
-                    ) {
-                        root.releasePointerCapture(endingPointerId);
-                    }
-                    fastReturn(scale, settings.slider.idleScale);
-                    fastReturn(stretchX, 1);
-                    fastReturn(stretchY, 1);
-                    fastReturn(activity, 0, 0.14);
-                    start();
-                };
-                root.addEventListener("pointerup", release);
-                root.addEventListener("pointercancel", release);
-                root.addEventListener("lostpointercapture", release);
-                root.addEventListener("dragstart", (event) => event.preventDefault());
-                new ResizeObserver(() => {
-                    thumbX = value * travel();
-                    apply();
-                    syncOpticalSurfaces("slider");
-                }).observe(root);
-                thumbX = value * travel();
-                apply();
             }
 
             function initTactileSwitch() {
@@ -2435,7 +2698,6 @@
                 }
             });
 
-            buildTuner();
             initInteractions();
         })();
     </script>

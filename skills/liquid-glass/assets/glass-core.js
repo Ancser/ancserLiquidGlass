@@ -665,11 +665,12 @@
         rebuildFilters();
     }
 
-    function syncOpticalSurfaces(component = null) {
+    function syncOpticalSurfaces(component = null, element = null) {
         if (destroyed) return;
         pendingSyncFrame = 0;
         surfaces.forEach((surface) => {
             if (component && surface.component !== component) return;
+            if (element && surface.element !== element) return;
             if (onSample) onSample(surface);
             const elementRect = surface.element.getBoundingClientRect();
             const stageRect = surface.stage.getBoundingClientRect();
@@ -801,6 +802,42 @@
         );
     }
 
+    /* Optical numbers are device-pixel quantities, but the same component
+       can legitimately be rendered at more than one CSS size. A 60px
+       gallery thumb and a 32px tuner thumb must not receive the same physical
+       bezel/thickness: on the smaller surface that would make the refraction
+       occupy most of the pill and pull the sampled edge out of proportion.
+
+       Use the largest live surface of a component as its reference geometry.
+       This keeps the public tuning contract simple (one settings object per
+       component) while making every smaller instance proportional. Layout
+       height comes from offsetHeight, so a motion transform cannot make the
+       baked physical profile grow during a drag. CSS may use rem/clamp/vw;
+       the engine only normalizes the measured result here. */
+    function componentReferenceHeight(component) {
+        let reference = 0;
+        surfaces.forEach((candidate) => {
+            if (candidate.component !== component || !candidate.element.isConnected) {
+                return;
+            }
+            reference = Math.max(reference, Number(candidate.element.offsetHeight) || 0);
+        });
+        return Math.max(1, reference);
+    }
+
+    function physicalConfigForSurface(config, component, element) {
+        const height = Math.max(1, Number(element?.offsetHeight) || 1);
+        const reference = componentReferenceHeight(component);
+        const scale = clamp(height / reference, 0.25, 1);
+        const normalized = {
+            ...config,
+            bezel: Number(config.bezel) * scale,
+            thickness: Number(config.thickness) * scale,
+            blur: Number(config.blur) * scale,
+        };
+        return { config: normalized, scale };
+    }
+
     const pendingSurfaceFilters = new Set();
     let pendingSurfaceFilterFrame = 0;
 
@@ -818,10 +855,17 @@
     }
 
     function rebuildSurface(surface) {
-        const config = settings[surface.component];
-        if (!config || !surface.element.isConnected) return;
+        const baseConfig = settings[surface.component];
+        if (!baseConfig || !surface.element.isConnected) return;
         const width = Math.max(2, Math.round(surface.element.offsetWidth));
         const height = Math.max(2, Math.round(surface.element.offsetHeight));
+        const normalized = physicalConfigForSurface(
+            baseConfig,
+            surface.component,
+            surface.element
+        );
+        const config = normalized.config;
+        surface.opticalScale = normalized.scale;
         const computed = getComputedStyle(surface.element);
         const radius = clamp(
             parseFloat(computed.borderTopLeftRadius) || height / 2,
@@ -932,7 +976,7 @@
             && surface.parentContainerSource
             && surface.parentComponent
         ) {
-            const parentConfig = settings[surface.parentComponent];
+            const parentBaseConfig = settings[surface.parentComponent];
             const parentWidth = Math.max(
                 2,
                 Math.round(surface.parentContainerSource.offsetWidth)
@@ -950,6 +994,12 @@
                 2,
                 Math.min(parentWidth, parentHeight) / 2
             );
+            const parentNormalized = physicalConfigForSurface(
+                parentBaseConfig,
+                surface.parentComponent,
+                surface.parentContainerSource
+            );
+            const parentConfig = parentNormalized.config;
             const parentKernel = opticalKernel(
                 parentConfig, parentWidth, parentHeight, parentRadius
             );
@@ -1129,7 +1179,10 @@
         observeResize,
         destroy,
         rebuild: (component) => scheduleFilterRebuild(component || null),
-        sync: (component) => syncOpticalSurfaces(component || null),
+        sync: (component, element) => syncOpticalSurfaces(
+            component || null,
+            element || null
+        ),
         rebuildNow: (component) => rebuildFilters(component || null),
         Spring,
         runSpringLoop,
