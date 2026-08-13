@@ -1,8 +1,6 @@
 # Liquid Optics Core
 
-一個以 SVG `feDisplacementMap` 實作的可調參數 Liquid Glass 元件引擎與
-Codex skill。網站首頁保持互動 gallery 與左側 tuner；README 只負責快速理解、
-複製與使用。
+一個以 SVG `feDisplacementMap` 實作的可調參數 Liquid Glass 元件引擎與 skill。網站gallery 與左側tuner方便快速調試效果；推薦使用coding agent輔助快速移植liquid glass到你目前的網站，此項目包含多種元件但Apple開發者手冊建議只在必要元件使用。
 
 ## Demo
 
