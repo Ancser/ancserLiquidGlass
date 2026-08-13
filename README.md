@@ -7,6 +7,8 @@ Apple開發者手冊建議只在必要元件使用Liquid Glass。
 
 ## Demo
 
+**Live demo:** [Open the interactive demo](https://ancser.github.io/ancserLiquidGlass/)
+
 `index.html` 是單頁互動 demo，左側 tuner 可以即時調整：
 
 - `01–09` 九個公開元件：Precision Lens、Fluid Slider、Tactile Switch、Drag Dock、Segment Control、Fluid Input、Squish Volume、Layered FAB、Magnetic Stepper。
