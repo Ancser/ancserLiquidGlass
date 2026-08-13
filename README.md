@@ -1,8 +1,9 @@
 # Liquid Optics Core
 
-一個以 SVG `feDisplacementMap` 實作的可調參數 Liquid Glass 元件引擎與
-Codex skill。網站首頁保持互動 gallery 與左側 tuner；README 只負責快速理解、
-複製與使用。
+一個以 SVG `feDisplacementMap` 實作的可調參數 Liquid Glass 元件引擎與 skill。
+網站gallery 與左側tuner方便快速調試效果；
+推薦使用coding agent輔助快速移植Liquid Glass到你目前的網站，
+Apple開發者手冊建議只在必要元件使用Liquid Glass。
 
 ## Demo
 
@@ -77,24 +78,4 @@ Codex skill。網站首頁保持互動 gallery 與左側 tuner；README 只負�
 - [`skills/liquid-glass/assets/glass-core.js`](skills/liquid-glass/assets/glass-core.js) — 唯一引擎程式碼。
 - [`skills/liquid-glass/assets/glass-core.css`](skills/liquid-glass/assets/glass-core.css) — 引擎結構 CSS。
 
-## GitHub Pages
 
-repository 已包含 `.github/workflows/pages.yml`。在 **Settings → Pages** 的
-**Build and deployment → Source** 選擇 **GitHub Actions**；之後每次 push 到
-`main` 都會自動部署。網站入口仍是根目錄的 `index.html`，預期網址為：
-`https://ancser.github.io/ancserLiquidGlass/`。
-
-## 本機預覽
-
-```bash
-python -m http.server 8777 --bind 127.0.0.1
-```
-
-然後開啟 <http://127.0.0.1:8777/>。
-
-## Verification
-
-```bash
-node --check skills/liquid-glass/assets/glass-core.js
-pytest -q
-```
