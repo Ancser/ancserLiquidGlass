@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="skills/liquid-glass/assets/glass-core.css">
+    <link rel="stylesheet" href="skills/liquid-glass/assets/glass-core.css?v=20260813-shadow">
     <style>
         :root {
             color-scheme: dark;
@@ -32,7 +32,7 @@
             --glass-relief:
                 inset 0 1px 1px rgb(255 255 255 / 0.18),
                 inset 0 -1px 1px rgb(0 0 0 / 0.34),
-                0 10px 26px rgb(0 0 0 / 0.22);
+                0 10px 26px rgb(0 0 0 / 0.18);
             --stage-scrim: linear-gradient(135deg, rgb(7 8 14 / 0.18), rgb(7 8 14 / 0.48));
             --cover-aspect-ratio: 3 / 2;
         }
@@ -286,6 +286,18 @@
             font-size: 12.5px;
             line-height: 1.8;
             opacity: 0.82;
+        }
+
+        .footer-citation {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 4px 24px;
+        }
+
+        .footer-citation > span {
+            white-space: nowrap;
         }
 
         .gallery-footer a {
@@ -580,7 +592,7 @@
 
                Override --stage-art on a single stage to compare one panel
                against different art without disturbing the rest. */
-            --stage-art: url("assets/vinyl-tropic-of-capricorn.jpg?v=20260813-aqua");
+            --stage-art: url("assets/rodion-kutsaiev-F573ZRbKOEw-unsplash.jpg?v=20260813-aqua");
         }
 
             .experiment-stage::before {
@@ -831,7 +843,9 @@
 
         .control-container-glass {
             z-index: 0;
-            inset: 0;
+            /* Extend the shell over the track's native one-pixel edge. Its
+               soft black shadow remains the edge sampled by the selector. */
+            inset: -1px;
             width: auto;
             height: auto;
             border-radius: inherit;
@@ -922,8 +936,11 @@
         .volume-zone {
             position: relative;
             z-index: 2;
-            width: 150px;
-            height: 360px;
+            /* The two-column gallery can leave a very small stage. Keep the
+               interaction target inside that stage so grid centering remains
+               real instead of overflowing from its padded content box. */
+            width: min(150px, 100%);
+            height: min(360px, 100%);
             border-radius: 999px;
             outline: none;
             touch-action: none;
@@ -942,10 +959,12 @@
         .volume-reservoir {
             position: absolute;
             z-index: 3;
-            left: 30px;
+            left: 20%;
             top: 10px;
-            width: 90px;
-            height: 340px;
+            right: 20%;
+            bottom: 10px;
+            width: auto;
+            height: auto;
             overflow: hidden;
             border-radius: 999px;
             background: rgb(0 0 0 / 0.38);
@@ -968,10 +987,12 @@
         }
 
         .volume-glass {
-            left: 30px;
+            left: 20%;
             top: 10px;
-            width: 90px;
-            height: 340px;
+            right: 20%;
+            bottom: 10px;
+            width: auto;
+            height: auto;
             pointer-events: none;
         }
 
@@ -1233,7 +1254,7 @@
                             <p>Drag the capsule across the sleeve.</p>
                         </div>
                         <div class="precision-image">
-                            <img src="assets/vinyl-tropic-of-capricorn.jpg?v=20260813-aqua" alt="Tropic of Capricorn — Kikuchi Momoko" draggable="false">
+                            <img src="assets/rodion-kutsaiev-F573ZRbKOEw-unsplash.jpg?v=20260813-aqua" alt="Abstract water texture by Rodion Kutsaiev" draggable="false">
                         </div>
                     </div>
                     <div class="optical-surface precision-lens" data-optical="precision" id="precisionLens"></div>
@@ -1385,6 +1406,21 @@
                     折射核心參考 kube.io 的〈Liquid Glass in the Browser〉一文:
                     將折射位移場烘焙成貼圖,紅色通道對應 X 軸、綠色通道對應 Y 軸,
                     再交給 <code>feDisplacementMap</code> 彎折背景。
+                </p>
+                <p class="footer-line footer-note footer-citation">
+                    <span>
+                        Background image:
+                        <a href="https://unsplash.com/photos/F573ZRbKOEw"
+                           target="_blank" rel="noreferrer noopener">Rodion Kutsaiev</a>
+                        on <a href="https://unsplash.com/@frostroomhead"
+                             target="_blank" rel="noreferrer noopener">Unsplash</a>.
+                    </span>
+                    <span lang="zh-Hant">
+                        背景圖片：<a href="https://unsplash.com/photos/F573ZRbKOEw"
+                        target="_blank" rel="noreferrer noopener">Rodion Kutsaiev</a>
+                        攝於 <a href="https://unsplash.com/@frostroomhead"
+                        target="_blank" rel="noreferrer noopener">Unsplash</a>。
+                    </span>
                 </p>
             </footer>
         </main>

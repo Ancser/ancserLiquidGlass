@@ -89,6 +89,19 @@
     visibility: hidden !important;
 }
 
+/* Preserve a container's soft shadow only in the background pass used by
+   Dock/Segment selectors. A standalone container (for example Input or
+   Stepper) must remain hidden in its own sampled stage copy; otherwise its
+   labels and controls are painted a second time. The parent material map
+   already carries the rim; this clone supplies only the shadow pixels that a
+   nested selector should see. */
+.optical-background-copy [data-container-glass] {
+    visibility: visible !important;
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: var(--glass-relief) !important;
+}
+
 /* UI-007: optical output never samples itself. A Tier-2 lens inside a
    sample would be the compositor painting its own previous frame --
    a feedback path, not a reflection. Tier-1 stays visible-as-material
