@@ -1417,9 +1417,12 @@
                 slider: { profile: "convex-squircle", bezel: 16, refraction: 0.85, thickness: 80, shrink: 0.00, specular: 0.60, blur: 0.10, saturation: 1.25, idleScale: 1.00, activeScale: 1.08, stiffness: 900, damping: 54, stretch: 0.17 },
                 switch: { profile: "convex-squircle", bezel: 19, refraction: 1.00, thickness: 47, shrink: 0.26, specular: 0.60, blur: 0.18, saturation: 1.25, idleScale: 1.00, activeScale: 1.50, stiffness: 820, damping: 48, stretch: 0.12 },
                 dock: { profile: "convex-squircle", bezel: 2, refraction: 1.45, thickness: 70, shrink: 0.08, specular: 0.00, blur: 0.00, saturation: 1.22, idleScale: 1.00, activeScale: 1.50, stiffness: 510, damping: 45, stretch: 0.00 },
-                dockContainer: { profile: "convex-squircle", bezel: 18, refraction: 0.92, thickness: 70, shrink: 0.00, specular: 0.60, blur: 0.20, saturation: 1.22, idleScale: 1.00, activeScale: 1.00, stiffness: 520, damping: 34, stretch: 0.00 },
+                /* A selector samples this shell as a second optical pass.
+                   Keep the shell highlight restrained so its rim does not
+                   stack with the thumb rim into a white thread. */
+                dockContainer: { profile: "convex-squircle", bezel: 18, refraction: 0.92, thickness: 70, shrink: 0.00, specular: 0.18, blur: 0.20, saturation: 1.22, idleScale: 1.00, activeScale: 1.00, stiffness: 520, damping: 34, stretch: 0.00 },
                 segment: { profile: "convex-squircle", bezel: 18, refraction: 0.88, thickness: 40, shrink: 0.20, specular: 0.60, blur: 0.18, saturation: 1.25, idleScale: 1.00, activeScale: 1.62, stiffness: 760, damping: 42, stretch: 0.14 },
-                segmentContainer: { profile: "convex-squircle", bezel: 18, refraction: 0.88, thickness: 68, shrink: 0.02, specular: 0.60, blur: 0.18, saturation: 1.25, idleScale: 1.00, activeScale: 1.00, stiffness: 760, damping: 42, stretch: 0.00 },
+                segmentContainer: { profile: "convex-squircle", bezel: 18, refraction: 0.88, thickness: 68, shrink: 0.02, specular: 0.18, blur: 0.18, saturation: 1.25, idleScale: 1.00, activeScale: 1.00, stiffness: 760, damping: 42, stretch: 0.00 },
                 /* No TPX counterpart -- specular aligned, optics left local. */
                 input: { profile: "convex-squircle", bezel: 18, refraction: 0.72, thickness: 66, shrink: 0.00, specular: 0.60, blur: 0.18, saturation: 1.20, idleScale: 1.00, activeScale: 1.015, stiffness: 580, damping: 32, stretch: 0.08 },
                 volume: { profile: "convex-squircle", bezel: 22, refraction: 0.82, thickness: 90, shrink: 0.00, specular: 0.60, blur: 0.16, saturation: 1.22, idleScale: 1.00, activeScale: 1.02, stiffness: 520, damping: 34, stretch: 0.24 },

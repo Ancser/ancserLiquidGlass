@@ -397,8 +397,15 @@
             height - inset * 2,
             Math.max(0, radius - inset)
         );
-        context.lineWidth = 2;
-        context.strokeStyle = shellStyle.borderTopColor;
+        /* The live container already owns the visible rim. The material map
+           only needs a restrained one-pixel copy for nested surfaces to
+           sample; painting the old 2px bright border here created a second,
+           offset white thread even when shrink was zero. */
+        const materialRim =
+            shellStyle.getPropertyValue("--glass-material-rim").trim()
+            || shellStyle.borderTopColor;
+        context.lineWidth = 1;
+        context.strokeStyle = materialRim;
         context.stroke();
         roundedRectPath(
             maskContext,
@@ -787,11 +794,13 @@
     }
 
     function containerMaterial(element, width, height, radius) {
-        /* Border colour is in the key because the material map paints
-           the container's own stroke, so a theme flip must miss. */
+        /* Both rim colours are in the key because the material map paints
+           the container's own stroke, so theme/token changes must miss. */
+        const shellStyle = getComputedStyle(element);
         const key = JSON.stringify([
             width, height, Number(radius.toFixed(3)),
-            getComputedStyle(element).borderTopColor,
+            shellStyle.borderTopColor,
+            shellStyle.getPropertyValue("--glass-material-rim").trim(),
         ]);
         const cached = containerMaterialCache.get(key);
         if (cached) return cached;

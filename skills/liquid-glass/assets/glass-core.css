@@ -36,6 +36,27 @@
     will-change: transform;
 }
 
+/* A container is also sampled by nested selector surfaces. Reusing the
+   regular .42 rim here makes that same edge appear twice: once on the live
+   shell and once in the parent's material map. Keep the shell subtle by
+   default, while leaving explicit container tokens available to adopters. */
+.optical-surface[data-container-glass] {
+    --glass-rim: var(
+        --glass-container-rim,
+        rgb(235 242 255 / 0.18)
+    );
+    --glass-material-rim: var(
+        --glass-container-material-rim,
+        rgb(235 242 255 / 0.10)
+    );
+    --glass-relief: var(
+        --glass-container-relief,
+        inset 0 1px 1px rgb(255 255 255 / 0.08),
+        inset 0 -1px 1px rgb(0 0 0 / 0.24),
+        0 10px 26px rgb(0 0 0 / 0.18)
+    );
+}
+
 .optical-layer {
     position: absolute;
     z-index: 0;
