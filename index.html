@@ -34,6 +34,7 @@
                 inset 0 -1px 1px rgb(0 0 0 / 0.34),
                 0 10px 26px rgb(0 0 0 / 0.22);
             --stage-scrim: linear-gradient(135deg, rgb(7 8 14 / 0.18), rgb(7 8 14 / 0.48));
+            --cover-aspect-ratio: 3 / 2;
         }
 
         * {
@@ -520,9 +521,9 @@
         .precision-image {
             position: relative;
             z-index: 2;
-            /* Square so the full record sleeve reads, never cropped. */
-            aspect-ratio: 1 / 1;
-            width: min(420px, 100%);
+            /* Match the source cover instead of forcing it into a square. */
+            aspect-ratio: var(--cover-aspect-ratio);
+            width: min(520px, 100%);
             justify-self: center;
             overflow: hidden;
             border-radius: 28px;
@@ -563,8 +564,8 @@
         }
 
         .experiment-stage {
-            /* Square so each sleeve shows whole, never cropped by the stage box. */
-            aspect-ratio: 1 / 1;
+            /* Every image-backed demo follows the source cover ratio. */
+            aspect-ratio: var(--cover-aspect-ratio);
             min-height: 0;
             /* One reference sleeve on every stage.
 
@@ -579,7 +580,7 @@
 
                Override --stage-art on a single stage to compare one panel
                against different art without disturbing the rest. */
-            --stage-art: url("assets/vinyl-tropic-of-capricorn.jpg");
+            --stage-art: url("assets/vinyl-tropic-of-capricorn.jpg?v=20260813-aqua");
         }
 
             .experiment-stage::before {
@@ -1135,7 +1136,7 @@
             }
 
             .precision-image {
-                width: min(320px, 100%);
+                width: min(420px, 100%);
             }
         }
 
@@ -1163,6 +1164,10 @@
 
             .stage {
                 min-height: 390px;
+            }
+
+            .experiment-stage {
+                min-height: 0;
             }
 
             .precision-world {
@@ -1228,7 +1233,7 @@
                             <p>Drag the capsule across the sleeve.</p>
                         </div>
                         <div class="precision-image">
-                            <img src="assets/vinyl-tropic-of-capricorn.jpg" alt="Tropic of Capricorn — Kikuchi Momoko" draggable="false">
+                            <img src="assets/vinyl-tropic-of-capricorn.jpg?v=20260813-aqua" alt="Tropic of Capricorn — Kikuchi Momoko" draggable="false">
                         </div>
                     </div>
                     <div class="optical-surface precision-lens" data-optical="precision" id="precisionLens"></div>
